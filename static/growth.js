@@ -7,14 +7,14 @@ function growthMask(){
  growthClearMask();const hide=Growth.hidden||Growth.presentation;
  document.body.classList.toggle('growth-presentation',Growth.presentation);
  if(!hide)return;
- const selectors=['#cloudApp .cloud-stat','#cloudApp .ui-main-amount','#cloudApp .ui-mini-stat>strong','#cloudApp .ui-activity-amount','#cloudApp .suite-bill-card .cloud-row>strong','#cloudApp .cloud-card-number','#cloudApp .cloud-card-fine','#cloudApp .cloud-row>strong','#cloudApp .cloud-card~.cloud-row>span:last-child','#cloudApp .suite-chart-row strong'];
+ const selectors=['#cloudApp [data-private-amount]','#cloudApp .cloud-stat','#cloudApp .ui-main-amount','#cloudApp .ui-mini-stat>strong','#cloudApp .ui-activity-amount','#cloudApp .suite-bill-card .cloud-row>strong','#cloudApp .cloud-card-number','#cloudApp .cloud-card-fine','#cloudApp .cloud-row>strong','#cloudApp .cloud-card~.cloud-row>span:last-child','#cloudApp .suite-chart-row strong'];
  if(Growth.presentation)selectors.push('#cloudApp .ui-profile>.cloud-muted','#cloudApp .ui-activity strong','#cloudApp .ui-cell-value','#cloudApp .suite-notification p','#cloudApp .suite-bill-head .cloud-muted','#cloudApp #growthPurchaseRecords','#cloudApp .growth-card-last4');
  document.querySelectorAll(selectors.join(',')).forEach(node=>{if(node.closest('input,textarea,select')||[...Growth.masked.keys()].some(parent=>parent.contains(node)))return;Growth.masked.set(node,[...node.childNodes]);node.replaceChildren(document.createTextNode('••••'));});
 }
 function growthPresentation(){Growth.presentation=!Growth.presentation;growthMask();growthChrome();cloudToast(Growth.presentation?tr('展示模式已开启，个人信息已遮挡，资金操作暂停','Presentation mode: personal information hidden and account changes paused'):tr('已退出展示模式','Presentation mode off'));}
 function growthChrome(){
  const utilities=$('cloudUserButton')?.parentElement;if(utilities&&!$('growthPrivacy')){const b=document.createElement('button');b.id='growthPrivacy';b.type='button';b.className='ui-bell growth-privacy';b.onclick=growthPresentation;utilities.prepend(b);}
- const b=$('growthPrivacy');if(b){b.hidden=!Cloud.user;b.textContent=Growth.presentation?'◉':'◌';b.setAttribute('aria-pressed',String(Growth.presentation));b.setAttribute('aria-label',tr('切换展示模式','Toggle presentation mode'));}
+ const b=$('growthPrivacy');if(b){b.setAttribute('data-localize','manual');b.hidden=!Cloud.user;b.textContent=Growth.presentation?'◉':'◌';b.setAttribute('aria-pressed',String(Growth.presentation));b.setAttribute('aria-label',tr('切换展示模式','Toggle presentation mode'));}
 }
 async function growthLoad(){
  const uid=Cloud.user?.id;if(!uid||Growth.loading===uid)return;Growth.loading=uid;

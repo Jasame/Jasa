@@ -75,8 +75,8 @@
       "sha256": "7f6c6edf628fe78c60364928f36b88fae94bd2c883ee1886cd71ea0632af1ccf"
     },
     "browser-tests/system.spec.cjs": {
-      "size": 6575,
-      "sha256": "0a125837b5324e97e7bb2ca1ec197443ce183ab27e50e9a6fec8b08ecc707234"
+      "size": 7934,
+      "sha256": "264f394affa7393b4cbd92d3b3fcbae36881d01172757b884638c5a69fff9972"
     },
     "cards.json": {
       "size": 13074,
@@ -199,8 +199,8 @@
       "sha256": "7131b2a9859c7e86cce13ce52576dc409156858edbc118a12fb31eb9c5f15169"
     },
     "static/core.js": {
-      "size": 157041,
-      "sha256": "f9e6f52642e3259647dac67e662b671d5924d392a2622cd050026318614cc48a"
+      "size": 157211,
+      "sha256": "8fc60da28b96dcb35eb2a4feafbd976d50f7e0ac8f3f7141e1ef4e7636d8ab7e"
     },
     "static/demo.html": {
       "size": 493,
@@ -219,12 +219,12 @@
       "sha256": "fb61cf85e691ba7e0e21a5d4d9fbb00e8215d44c4eeb0285726c383716d60479"
     },
     "static/growth.js": {
-      "size": 25834,
-      "sha256": "23e71db7a21cacd222a399253567e4d044aaefb5d44ccd08ddc94c293de7d41e"
+      "size": 25909,
+      "sha256": "de041d85f3ce773924a7c483e426c08e2e185896a107a2f3e69bb80bb21b582d"
     },
     "static/index.html": {
-      "size": 88085,
-      "sha256": "2fb59fb9d5b49930e797d747da435e1d769e5a1bbe890b1fb68f63052672575d"
+      "size": 88112,
+      "sha256": "45d53a528df7c20a6bab7824dbf52dc84f80ced2676a00e96a7e0b7f1f1f6af5"
     },
     "static/jspdf.umd.min.js": {
       "size": 364422,
@@ -255,8 +255,8 @@
       "sha256": "20e30685494b85d34ea369294e2e16aa602950e7266708923794db1b0ecc6889"
     },
     "static/ui.js": {
-      "size": 31905,
-      "sha256": "59c6b5abb6d2e6d3bd2bb5622a524b997b864743f5e3b8117bd86e7e86904f57"
+      "size": 32026,
+      "sha256": "9e8bba4c8484631139c0e50a454332fe0f76a389be99db9126eba670b5646ee1"
     },
     "suite.py": {
       "size": 16565,

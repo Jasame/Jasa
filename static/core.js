@@ -2058,7 +2058,8 @@ const SORTED_TRANSLATIONS = Object.entries(UI_TRANSLATIONS).sort((a,b)=>b[0].len
         if(en!==value){originalTranslations.set(node,{zh:value,en});node.nodeValue=en;}
       }
       document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>{
-        if(el.closest('#cloudApp,#cloudAuth,#cloudAccount'))return;
+        // Components that render their own translations also own their accessible labels.
+        if(el.closest('#cloudApp,#cloudAuth,#cloudAccount,[data-localize=manual]'))return;
         for(const attr of ['placeholder','title','aria-label']){
           const value=el.getAttribute(attr);if(!value)continue;
           const key='data-original-'+attr;
@@ -2071,6 +2072,7 @@ const SORTED_TRANSLATIONS = Object.entries(UI_TRANSLATIONS).sort((a,b)=>b[0].len
       const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
       while(n=walker.nextNode()){const v=originalTranslations.get(n);if(v&&n.nodeValue===v.en)n.nodeValue=v.zh;}
       document.querySelectorAll('[data-original-placeholder],[data-original-title],[data-original-aria-label]').forEach(el=>{
+        if(el.closest('[data-localize=manual]'))return;
         for(const a of ['placeholder','title','aria-label'])if(el.hasAttribute('data-original-'+a))el.setAttribute(a,el.getAttribute('data-original-'+a));
       });
     }

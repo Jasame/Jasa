@@ -9,3 +9,24 @@ test('purchase, partial repayment, PDF and refund',async({page,request})=>{const
 test('MFA setup, recovery-code sign in and presentation privacy',async({page,request})=>{const user=await fixture(request);await login(page,user);await tab(page,'security');await page.locator('#growthMfaEntry button').click();await page.locator('#growthMfaPassword').fill(user.password);await page.locator('#growthMfa').getByRole('button',{name:'开始绑定',exact:true}).click();const secret=await page.locator('#growthMfaSetup code').textContent();await page.locator('#growthMfaConfirm').fill(totp(secret,Math.floor(user.now/30)));await page.locator('#growthMfa').getByRole('button',{name:'确认启用',exact:true}).click();const recovery=(await page.locator('#growthMfa pre').textContent()).trim().split('\n')[0];await page.locator('#growthMfa .cloud-close').click();await page.evaluate(()=>logoutCloud(false));await page.locator('#cloudUserButton').click();await page.locator('#authEmail').fill(user.email);await page.locator('#authPassword').fill(user.password);await page.locator('#authSubmit').click();await expect(page.locator('#authFactor')).toBeVisible();await page.locator('#authFactor').fill(recovery);await page.locator('#authSubmit').click();await expect(page.locator('#page-cloud')).toHaveClass(/is-active/);await tab(page,'overview');await expect(page.locator('.ui-main-amount')).toBeVisible();await page.locator('#growthPrivacy').click();await expect(page.locator('.ui-main-amount')).toHaveText('••••');await page.locator('#growthPrivacy').click();await expect(page.locator('.ui-main-amount')).not.toHaveText('••••');});
 test('administrator navigation and operations',async({page,request,isMobile})=>{const user=await fixture(request,true);await login(page,user);await page.goto('admin/');if(!await page.locator('.nav [data-view=users]').isVisible())await page.locator('.admin-nav-toggle').click();await expect(page.locator('.nav [data-view=users]')).toBeVisible();await page.locator('.nav [data-view=users]').click();await expect(page.locator('#content table')).toBeVisible();if(!await page.locator('.nav [data-view=operations]').isVisible())await page.locator('.admin-nav-toggle').click();await page.locator('.nav [data-view=operations]').click();await expect(page.locator('h1')).toContainText('运行与反馈');await expect(page.locator('#content')).not.toContainText('undefined');await noOverflow(page);});
 test('public card gallery visual baseline',async({page})=>{await page.goto('./');await page.evaluate(()=>switchPage('cards'));await expect(page.locator('.ui-product-tile')).toHaveCount(6);await page.evaluate(()=>document.fonts.ready);await expect(page).toHaveScreenshot('public-cards.png',{fullPage:true,animations:'disabled'});});
+
+// Keep real UI behavior covered: localization observers must not overwrite dynamic labels.
+test('private credit and accessible labels survive rerenders and language changes',async({page,request})=>{
+ const user=await fixture(request);await login(page,user);await tab(page,'overview');
+ const credit=page.locator('[data-private-amount]');
+ const original=await credit.textContent();expect(original).toMatch(/\$[\d,]+\.\d{2}/);
+ await page.locator('#growthPrivacy').click();
+ await expect(credit).toHaveText('••••');
+ await page.getByRole('button',{name:'刷新账户',exact:true}).click();
+ await expect(credit).toHaveText('••••');
+ await page.locator('#langBtnEn').click();
+ await expect(page.locator('#uiPageTitle')).toHaveText('Overview');
+ await expect(page.locator('#uiBell')).toHaveAttribute('aria-label',/^Notifications/);
+ await expect(page.locator('#growthPrivacy')).toHaveAttribute('aria-label','Toggle presentation mode');
+ await expect(credit).toHaveText('••••');
+ await page.locator('#growthPrivacy').click();await expect(credit).toHaveText(original);
+ await page.locator('#langBtnZh').click();
+ await expect(page.locator('#uiBell')).toHaveAttribute('aria-label',/^通知/);
+ await expect(page.locator('#growthPrivacy')).toHaveAttribute('aria-label','切换展示模式');
+ await expect(credit).toHaveText(original);
+});
