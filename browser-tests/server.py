@@ -15,6 +15,8 @@ def fixture():
     if request.remote_addr!='127.0.0.1':return '',403
     uid=uuid.uuid4().hex;email=uid+'@example.test';password='browser-test-password';data=request.get_json() or {}
     with sqlite3.connect(app.config['DATABASE']) as db:
+        # Each scenario starts with a fresh loopback login budget in this temporary test DB.
+        db.execute("DELETE FROM limits WHERE key='login-ip:127.0.0.1'")
         db.execute('INSERT INTO users VALUES(?,?,?,?,?)',(uid,email,generate_password_hash(password),int(bool(data.get('admin'))),now));db.execute('INSERT INTO accounts VALUES(?,?,0)',(uid,json.dumps(empty_state())))
     client=app.test_client();h={'X-JWB-Client':'web'};r=client.post('/bank/api/auth/login',json={'email':email,'password':password},headers=h);h['X-CSRF-Token']=r.json['csrf']
     def command(route,body):

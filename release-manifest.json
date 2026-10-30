@@ -71,12 +71,12 @@
       "sha256": "11761d30847e931ee4bb2a736fc9268acaa4b4fe25eac0cf9a9056d9fcac6482"
     },
     "browser-tests/server.py": {
-      "size": 2852,
-      "sha256": "9dd731b07a4fbb1c39b9d5a0fd9064a0074a7b8144b737da00e143fc4f14da3f"
+      "size": 3017,
+      "sha256": "7f6c6edf628fe78c60364928f36b88fae94bd2c883ee1886cd71ea0632af1ccf"
     },
     "browser-tests/system.spec.cjs": {
-      "size": 6385,
-      "sha256": "125f7c1a45e05f552fbbefeff385bbdea3ba1283300b66bb151dc0d452bbc40b"
+      "size": 6472,
+      "sha256": "cedc10d0cd1c8d1e8371c39604a9ec975bf8efed2dba3357f106f34456ae4018"
     },
     "cards.json": {
       "size": 13074,
