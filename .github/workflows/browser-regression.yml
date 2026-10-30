@@ -1,8 +1,11 @@
 name: Browser regression
 on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -10,7 +13,7 @@ jobs:
           python-version: '3.11'
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - run: pip install -r requirements.txt
       - run: npm install
         working-directory: browser-tests

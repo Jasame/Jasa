@@ -52,3 +52,9 @@ python -m unittest discover -s tests -v
 ## 许可
 
 字体和第三方组件遵循各自的许可。此仓库暂未为项目自有源码指定开源许可证。
+
+## 参与与支持
+
+[贡献指南](CONTRIBUTING.md) · [使用支持](SUPPORT.md) · [安全报告](SECURITY.md) · [报告问题](https://github.com/Jasame/Jasa/issues/new/choose)
+
+自动检查：[后端测试](https://github.com/Jasame/Jasa/actions/workflows/backend-tests.yml) · [浏览器回归](https://github.com/Jasame/Jasa/actions/workflows/browser-regression.yml)。测试结果以对应提交的 Actions 记录为准。
