@@ -128,5 +128,5 @@ document.addEventListener('toggle',event=>{const d=event.target;if(d.matches?.('
 
 function uiActivityTime(value){if(!value)return '—';const date=new Date(typeof value==='number'?value*1000:value);return Number.isNaN(date.getTime())?String(value):date.toLocaleString(currentLang==='en'?'en-GB':'zh-CN',{timeZone:'Asia/Shanghai'});}
 
-function uiMoneyInputs(){for(const [currencyId,amountId] of [['depositCurrency','depositAmount'],['purchaseCurrency','purchaseAmount'],['cloudFxFrom','cloudFxAmount']]){const currency=$(currencyId),amount=$(amountId);if(currency&&amount){amount.step=currency.value==='JPY'?'1':'0.01';amount.min=currency.value==='JPY'?'1':'0.01';}}}
+function uiMoneyInputs(){for(const [currencyId,amountId] of [['depositCurrency','depositAmount'],['purchaseCurrency','purchaseAmount'],['cloudFxFrom','cloudFxAmount']]){const currency=$(currencyId),amount=$(amountId);if(currency&&amount){amount.step=currency.value==='JPY'?'1':'0.01';amount.min=currency.value==='JPY'?'1':'0.01';amount.inputMode=currency.value==='JPY'?'numeric':'decimal';}}}
 document.addEventListener('change',event=>{if(['depositCurrency','purchaseCurrency','cloudFxFrom'].includes(event.target.id))uiMoneyInputs();});

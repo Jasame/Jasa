@@ -30,3 +30,22 @@ test('private credit and accessible labels survive rerenders and language change
  await expect(page.locator('#growthPrivacy')).toHaveAttribute('aria-label','切换展示模式');
  await expect(credit).toHaveText(original);
 });
+
+// Exercise native field labels and mobile currency precision instead of ID fallbacks.
+test('labelled money fields and private card suffix work across devices',async({page,request})=>{
+ const user=await fixture(request);await login(page,user);await tab(page,'treasury');
+ await expect(page.getByLabel('入金币种',{exact:true})).toBeVisible();
+ await page.getByLabel('入金币种',{exact:true}).selectOption('JPY');
+ const amount=page.getByLabel('模拟金额',{exact:true});
+ await expect(amount).toHaveAttribute('inputmode','numeric');await expect(amount).toHaveAttribute('step','1');
+ await page.getByLabel('入金币种',{exact:true}).selectOption('USD');
+ await expect(amount).toHaveAttribute('inputmode','decimal');await expect(amount).toHaveAttribute('step','0.01');
+ await page.getByLabel('兑入',{exact:true}).selectOption('HKD');
+ await expect(page.getByLabel('兑入',{exact:true})).toHaveValue('HKD');
+ await tab(page,'cards');const suffix=page.locator('[data-private-detail]');
+ const original=await suffix.textContent();expect(original).toMatch(/^\d{4}$/);
+ await page.locator('#growthPrivacy').click();await expect(suffix).toHaveText('••••');
+ await expect(page.locator('.cloud-list-card')).toContainText('ACTIVE');
+ await page.getByRole('button',{name:'刷新账户',exact:true}).click();await expect(suffix).toHaveText('••••');
+ await page.locator('#growthPrivacy').click();await expect(suffix).toHaveText(original);
+});

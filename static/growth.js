@@ -8,7 +8,7 @@ function growthMask(){
  document.body.classList.toggle('growth-presentation',Growth.presentation);
  if(!hide)return;
  const selectors=['#cloudApp [data-private-amount]','#cloudApp .cloud-stat','#cloudApp .ui-main-amount','#cloudApp .ui-mini-stat>strong','#cloudApp .ui-activity-amount','#cloudApp .suite-bill-card .cloud-row>strong','#cloudApp .cloud-card-number','#cloudApp .cloud-card-fine','#cloudApp .cloud-row>strong','#cloudApp .cloud-card~.cloud-row>span:last-child','#cloudApp .suite-chart-row strong'];
- if(Growth.presentation)selectors.push('#cloudApp .ui-profile>.cloud-muted','#cloudApp .ui-activity strong','#cloudApp .ui-cell-value','#cloudApp .suite-notification p','#cloudApp .suite-bill-head .cloud-muted','#cloudApp #growthPurchaseRecords','#cloudApp .growth-card-last4');
+ if(Growth.presentation)selectors.push('#cloudApp [data-private-detail]','#cloudApp .ui-profile>.cloud-muted','#cloudApp .ui-activity strong','#cloudApp .ui-cell-value','#cloudApp .suite-notification p','#cloudApp .suite-bill-head .cloud-muted','#cloudApp #growthPurchaseRecords','#cloudApp .growth-card-last4');
  document.querySelectorAll(selectors.join(',')).forEach(node=>{if(node.closest('input,textarea,select')||[...Growth.masked.keys()].some(parent=>parent.contains(node)))return;Growth.masked.set(node,[...node.childNodes]);node.replaceChildren(document.createTextNode('••••'));});
 }
 function growthPresentation(){Growth.presentation=!Growth.presentation;growthMask();growthChrome();cloudToast(Growth.presentation?tr('展示模式已开启，个人信息已遮挡，资金操作暂停','Presentation mode: personal information hidden and account changes paused'):tr('已退出展示模式','Presentation mode off'));}

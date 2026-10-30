@@ -2084,7 +2084,7 @@ const SORTED_TRANSLATIONS = Object.entries(UI_TRANSLATIONS).sort((a,b)=>b[0].len
     }
     function enhanceAccess(){
       document.querySelectorAll('div[onclick]').forEach(el=>{if(!el.hasAttribute('role')){el.setAttribute('role','button');el.tabIndex=0;}});
-      document.querySelectorAll('input,select').forEach(el=>{if(!el.hasAttribute('aria-label')){const label=el.parentElement.querySelector('label');el.setAttribute('aria-label',label?.textContent.trim()||el.id);}});
+      document.querySelectorAll('input,select').forEach(el=>{if(!el.hasAttribute('aria-label')&&!el.labels?.length){const label=el.parentElement.querySelector('label');el.setAttribute('aria-label',label?.textContent.trim()||el.id);}});
       for(const lang of ['zh','en'])document.getElementById(lang==='zh'?'langBtnZh':'langBtnEn').setAttribute('aria-pressed',String(currentLang===lang));
     }
 

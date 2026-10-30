@@ -75,8 +75,8 @@
       "sha256": "7f6c6edf628fe78c60364928f36b88fae94bd2c883ee1886cd71ea0632af1ccf"
     },
     "browser-tests/system.spec.cjs": {
-      "size": 7934,
-      "sha256": "264f394affa7393b4cbd92d3b3fcbae36881d01172757b884638c5a69fff9972"
+      "size": 9393,
+      "sha256": "132aa3332039c1c901a0d87730fc246e7523ec44086c877935479af4ffa850ee"
     },
     "cards.json": {
       "size": 13074,
@@ -195,12 +195,12 @@
       "sha256": "4d5358ea300ea565a7cf6395d05bcbff3ec67a3117df472d98362c9e822e9368"
     },
     "static/cloud.js": {
-      "size": 51054,
-      "sha256": "7131b2a9859c7e86cce13ce52576dc409156858edbc118a12fb31eb9c5f15169"
+      "size": 51087,
+      "sha256": "210a961e4badc76790ea19abd436a3855decbe06f92e592eff25373822ad9b17"
     },
     "static/core.js": {
-      "size": 157211,
-      "sha256": "8fc60da28b96dcb35eb2a4feafbd976d50f7e0ac8f3f7141e1ef4e7636d8ab7e"
+      "size": 157231,
+      "sha256": "6e7f011e3985a0ea6bcd9d0d685c36b0b976e74b5fb23780d51788787cecef3d"
     },
     "static/demo.html": {
       "size": 493,
@@ -219,12 +219,12 @@
       "sha256": "fb61cf85e691ba7e0e21a5d4d9fbb00e8215d44c4eeb0285726c383716d60479"
     },
     "static/growth.js": {
-      "size": 25909,
-      "sha256": "de041d85f3ce773924a7c483e426c08e2e185896a107a2f3e69bb80bb21b582d"
+      "size": 25943,
+      "sha256": "22070dcd4e72c72d8fd258c5d39dfd072c80c77eb0ca93922359c23b1b555ed9"
     },
     "static/index.html": {
-      "size": 88112,
-      "sha256": "45d53a528df7c20a6bab7824dbf52dc84f80ced2676a00e96a7e0b7f1f1f6af5"
+      "size": 88121,
+      "sha256": "95ea3a51b6678cb5410370b0f845b174fcc4b492fe623c6b050218b74cbc36af"
     },
     "static/jspdf.umd.min.js": {
       "size": 364422,
@@ -255,8 +255,8 @@
       "sha256": "20e30685494b85d34ea369294e2e16aa602950e7266708923794db1b0ecc6889"
     },
     "static/ui.js": {
-      "size": 32026,
-      "sha256": "9e8bba4c8484631139c0e50a454332fe0f76a389be99db9126eba670b5646ee1"
+      "size": 32086,
+      "sha256": "d8c206b37f14eb916f40f35167165eeabf56e6b804ce4b0cd5df431d773c1801"
     },
     "suite.py": {
       "size": 16565,
