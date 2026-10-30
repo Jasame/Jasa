@@ -75,8 +75,8 @@
       "sha256": "7f6c6edf628fe78c60364928f36b88fae94bd2c883ee1886cd71ea0632af1ccf"
     },
     "browser-tests/system.spec.cjs": {
-      "size": 6472,
-      "sha256": "cedc10d0cd1c8d1e8371c39604a9ec975bf8efed2dba3357f106f34456ae4018"
+      "size": 6575,
+      "sha256": "0a125837b5324e97e7bb2ca1ec197443ce183ab27e50e9a6fec8b08ecc707234"
     },
     "cards.json": {
       "size": 13074,
