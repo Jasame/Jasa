@@ -36,7 +36,7 @@ function productOptions(value){return JWB_CARDS.map(c=>`<option value="${c.id}" 
 function currencyOptions(value='USD'){return Object.keys(db.treasuryWallets).map(c=>`<option ${c===value?'selected':''}>${c}</option>`).join('');}
 function cardOptions(value){return db.cards.filter(c=>c.status!=='CLOSED').map(c=>`<option value="${esc(c.uid)}" ${c.uid===value?'selected':''}>${esc(JWB_CARDS.find(p=>p.id===c.cardId).name)} · ${c.cardNumber.slice(-4)}</option>`).join('');}
 function field(label,id,type='text',value='',attrs=''){return `<label class="cloud-field">${label}<input id="${id}" type="${type}" value="${esc(value)}" ${attrs}></label>`;}
-function selectField(label,id,options){return `<label class="cloud-field">${label}<select id="${id}">${options}</select></label>`;}
+function selectField(label,id,options){return `<label class="cloud-field"><span id="${id}Label">${label}</span><select id="${id}" aria-labelledby="${id}Label">${options}</select></label>`;}
 function button(text,onclick,primary=false){return `<button class="cloud-btn${primary?' primary':''}" type="button" onclick="${onclick}">${text}</button>`;}
 function notice(zh,en){return `<p class="cloud-notice">${tr(zh,en)}</p>`;}
 function emptyCards(){return `<div class="cloud-panel cloud-empty"><div class="cloud-symbol">◇</div><h2>${tr('你的第一张卡，从这里开始','Your first card starts here')}</h2><p class="cloud-muted">${tr('新账户没有预置资金和卡片。填写模拟资料，即可获得系统即时审批。','New accounts start with no funds or cards. Apply with simulated information for an instant decision.')}</p><div class="cloud-actions" style="justify-content:center">${button(tr('申请第一张卡','Apply for a card'),"cloudTab('apply')",true)}${button(tr('浏览卡片','Explore cards'),"switchPage('cards')")}</div></div>`;}

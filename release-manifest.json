@@ -195,8 +195,8 @@
       "sha256": "4d5358ea300ea565a7cf6395d05bcbff3ec67a3117df472d98362c9e822e9368"
     },
     "static/cloud.js": {
-      "size": 51087,
-      "sha256": "210a961e4badc76790ea19abd436a3855decbe06f92e592eff25373822ad9b17"
+      "size": 51145,
+      "sha256": "82db1ea2cea326f231f153b24c732842447735a00841105699decfb01c3ee82d"
     },
     "static/core.js": {
       "size": 157231,
