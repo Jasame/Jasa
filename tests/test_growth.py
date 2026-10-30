@@ -105,7 +105,7 @@ class GrowthTests(unittest.TestCase):
             for _ in range(3):db.execute("INSERT INTO mail_events(email,purpose,result,error_category,created) VALUES('test@example.com','login','failed','transport',?)",(self.now,))
         first=self.app.extensions['run_ops_checks'](heartbeat=False);self.assertFalse(first['checks']['mail']['ok']);self.assertTrue(first['checks']['backup']['ok']);sent=len(self.app.extensions.get('ops_outbox',[]));self.assertGreater(sent,0);self.app.extensions['run_ops_checks'](heartbeat=False);self.assertEqual(len(self.app.extensions['ops_outbox']),sent);self.now+=4*3600;later=self.app.extensions['run_ops_checks'](heartbeat=False,send=False);self.assertFalse(later['checks']['maintenance']['ok'])
     def test_health_releases_assets_and_private_endpoints(self):
-        guest=self.app.test_client();self.assertEqual(guest.get('/api/health').json['version'],'6.0.0');self.assertEqual(guest.get('/api/releases').json[0]['version'],'6.0.0')
+        guest=self.app.test_client();self.assertEqual(guest.get('/api/health').json['version'],'6.0.1');self.assertEqual(guest.get('/api/releases').json[0]['version'],'6.0.1')
         for path in ['preferences','card-services','calendar','feedback','security/mfa','admin/operations']:self.assertEqual(guest.get('/api/'+path).status_code,401)
         for asset in ['growth.js','growth.css','admin-growth.js']:
             r=guest.get('/assets/'+asset);self.assertEqual(r.status_code,200);r.close()

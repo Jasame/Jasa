@@ -288,7 +288,7 @@
     },
     "tests/test_growth.py": {
       "size": 14428,
-      "sha256": "a00f5ef52743ea0366cd69dcf85ff90495365bff1acc5c428e230f611e31f2d4"
+      "sha256": "a7a338305ec993452a0718edd70f726544311501960e1173e4f4447f6a139f71"
     },
     "tests/test_suite.py": {
       "size": 13738,
