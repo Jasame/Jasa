@@ -1,0 +1,20 @@
+[
+  {
+    "version": "6.0.1",
+    "date": "2026-10-18",
+    "zh": "线上体验修复：即时完整语言切换、版本标识、负金额格式、无障碍状态提示；拆分首屏资源，证书 PDF 组件按需加载。",
+    "en": "Live-site fixes: complete instant language switching, version labels, signed currency formatting and accessible status messages; cacheable page assets and on-demand certificate PDF runtime."
+  },
+  {
+    "version": "6.0.0",
+    "date": "2026-10-18",
+    "zh": "长期运行升级：可回退升级工具、运行提醒、退款与持卡服务、二次验证、偏好与展示模式、权益日历、用户反馈及浏览器回归配置。",
+    "en": "Long-term operations: rollback-capable updates, health alerts, refunds and card lifecycle, MFA, preferences and presentation privacy, calendar, feedback and browser regression configuration."
+  },
+  {
+    "version": "5.0.3",
+    "date": "2026-10-18",
+    "zh": "修复后台导航隐藏、账单留白、刷新和筛选交互。",
+    "en": "Fixed hidden admin navigation, statement spacing and refresh/filter interactions."
+  }
+]

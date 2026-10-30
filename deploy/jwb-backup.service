@@ -1,0 +1,15 @@
+[Unit]
+Description=Verified JWB SQLite backup
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/jwb-cloud
+ExecStart=/www/wwwroot/jwb-cloud/.venv/bin/python manage.py backup-daily /www/backup/jwb-cloud --keep 14
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true

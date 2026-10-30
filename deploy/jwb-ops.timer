@@ -1,0 +1,9 @@
+[Unit]
+Description=Check JWB health every five minutes
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+Persistent=true
+Unit=jwb-ops.service
+[Install]
+WantedBy=timers.target

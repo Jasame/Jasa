@@ -1,0 +1,27 @@
+.env
+.venv/
+data/
+__pycache__/
+*.pyc
+*.sqlite3*
+*.log
+backups/
+
+# Local settings, credentials, and user-generated data
+.env.*
+!.env.example
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sql
+*.csv
+*.xlsx
+*.zip
+*.bak
+uploads/
+exports/
+logs/
+instance/
+node_modules/
+.DS_Store

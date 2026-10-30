@@ -1,0 +1,8 @@
+[Unit]
+Description=Hourly JWB statement and benefit maintenance
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=jwb-maintenance.service
+[Install]
+WantedBy=timers.target

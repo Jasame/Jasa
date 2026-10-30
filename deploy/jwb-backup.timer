@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily verified JWB backup
+
+[Timer]
+OnCalendar=*-*-* 04:15:00 Asia/Shanghai
+RandomizedDelaySec=5m
+Persistent=true
+Unit=jwb-backup.service
+
+[Install]
+WantedBy=timers.target

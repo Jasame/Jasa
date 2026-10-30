@@ -1,0 +1,52 @@
+"""Server-generated statements and annual reports. No trusted bank signature is claimed."""
+from io import BytesIO
+from pathlib import Path
+import threading
+from xml.sax.saxutils import escape
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table,TableStyle
+from datetime import datetime
+from suite import TZ
+from domain import PRODUCTS
+
+_font_lock=threading.Lock()
+def report_pdf(kind,data,email,language='zh'):
+    with _font_lock:
+        if 'JWBReport' not in pdfmetrics.getRegisteredFontNames():pdfmetrics.registerFont(TTFont('JWBReport',str(Path(__file__).parent/'fonts/JWB-NotoSC.ttf')))
+    tr=lambda zh,en:en if language=='en' else zh
+    out=BytesIO();navy=colors.HexColor('#142337');gold=colors.HexColor('#aa8746');muted=colors.HexColor('#64748b')
+    body=ParagraphStyle('body',fontName='JWBReport',fontSize=9,leading=15,wordWrap='CJK',textColor=navy,spaceAfter=8)
+    small=ParagraphStyle('small',parent=body,fontSize=8,leading=12,textColor=muted)
+    heading=ParagraphStyle('heading',parent=body,fontSize=21,leading=30,spaceAfter=12)
+    section=ParagraphStyle('section',parent=body,fontSize=12,leading=19,spaceBefore=15,spaceAfter=9)
+    para=lambda s,style=body:Paragraph(escape(str(s)).replace('\n','<br/>'),style)
+    story=[para('JWB  /  JASA WORLDWIDE BANK',section),para(tr('月度模拟账单','Monthly Simulation Statement') if kind=='statement' else tr('年度模拟用卡报告','Annual Simulation Card Report'),heading),para(email,small)]
+    date=lambda n:datetime.fromtimestamp(n,TZ).strftime('%Y-%m-%d %H:%M')
+    money=lambda n:f'USD {n/100:,.2f}'
+    def table(rows,widths):
+        t=Table([[para(v,small) for v in row] for row in rows],colWidths=widths,repeatRows=1,hAlign='LEFT')
+        t.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#eef1f4')),('LINEBELOW',(0,0),(-1,0),.7,gold),('LINEBELOW',(0,1),(-1,-1),.3,colors.HexColor('#e4e8ed')),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),8),('RIGHTPADDING',(0,0),(-1,-1),8),('TOPPADDING',(0,0),(-1,-1),9),('BOTTOMPADDING',(0,0),(-1,-1),8)]));story.append(t)
+    if kind=='statement':
+        card=data['card'];story+=[para(data['id'],small),para(PRODUCTS[card['cardId']]['name']+'  /  •••• '+card['last4']),para(tr('持卡人','Cardholder')+': '+card['holderName'],small),para(tr('账期','Period')+': '+date(data['periodStart'])+' - '+date(data['closeAt']-1),small),para(tr('还款截止','Payment due')+': '+date(data['dueAt']),small)]
+        table([[tr('项目','Item'),tr('金额','Amount')],[tr('期初欠款','Opening balance'),money(data['openingCents'])],[tr('本期新增欠款','New charges'),money(data['chargesCents'])],[tr('本期还款','Payments'),money(data['paymentsCents'])],[tr('本期权益等抵扣','Credits'),money(data['creditsCents'])],[tr('出账时余额','Balance at close'),money(data['closingCents'])],[tr('下载时仍未结清的本账期欠款','Unpaid amount at download'),money(data['remainingCents'])]],[335,176])
+        story.append(para(tr('本期明细','Period activity'),section))
+        kinds={'opening':tr('升级期初','Opening'),'charge':tr('新增欠款','Charge'),'credit':tr('抵扣','Credit'),'payment':tr('还款','Payment')}
+        rows=[[tr('北京时间','Beijing time'),tr('类型','Type'),tr('说明','Description'),'USD']]
+        rows.extend([date(e['created']),kinds[e['kind']],e['description'],f'{e["cents"]/100:,.2f}'] for e in data['items'])
+        if len(rows)==1:rows.append(['-','-',tr('本期无新增明细','No new activity this period'),'0.00'])
+        table(rows,[85,65,271,90])
+    else:
+        t=data['totals'];story+=[para(str(data['year']),section),para(tr('仅统计系统完整记录覆盖期间的数据；缺失历史不补造。','Only retained, fully recorded activity is included. Missing history is not reconstructed.'),small)]
+        table([[tr('指标','Metric'),tr('数值','Value')],[tr('净消费（含退款）','Net purchases (after refunds)'),money(t['purchase_cents'])],[tr('常规消费积分','Purchase rewards'),f'{t["reward_points"]:,} JR'],[tr('开卡奖励','Welcome rewards'),f'{t["welcome_points"]:,} JR'],[tr('权益抵扣','Benefit credits'),money(t['credits_cents'])],[tr('模拟年费','Demo annual fees'),money(t['fees_cents'])],[tr('积分加抵扣减年费的模拟估值','Reward value + credits - fees (demo)'),money(t['reward_points']+t['welcome_points']+t['credits_cents']-t['fees_cents'])]],[335,176])
+        story.append(para(tr('每月消费','Purchases by month'),section))
+        table([[tr('月份','Month'),'USD']]+([[k,f'{v/100:,.2f}'] for k,v in sorted(data['monthly'].items()) if v!=0] or [[tr('无消费','No purchases'),'0.00']]),[335,176])
+        story.append(para(tr('按类别消费','Purchases by category'),section));table([[tr('类别','Category'),'USD']]+([[k,f'{v/100:,.2f}'] for k,v in data['groups']['category'].items() if v!=0] or [[tr('无消费','No purchases'),'0.00']]),[335,176])
+    story += [Spacer(1,18),para(tr('本文件由 JWB 模拟体验系统生成。所有资金、授信、权益、积分与交易均为模拟，不是银行对账单、真实负债证明或受信任电子签章文件。账单按北京时间结算，还款先分配至最早欠款；不自动收取逾期利息或罚金。','Generated by the JWB simulation. All funds, credit, benefits, rewards and transactions are simulated. This is not a bank statement, proof of real debt or a trusted digitally signed document. Billing uses Beijing time; payments settle the oldest debt first. No late interest or penalties are charged.'),small)]
+    def page(canvas,doc):
+        canvas.saveState();canvas.setStrokeColor(gold);canvas.setLineWidth(.6);canvas.line(42,804,553,804);canvas.line(42,43,553,43);canvas.setFont('JWBReport',7);canvas.setFillColor(muted);canvas.drawString(42,29,'JWB SIMULATION  /  SYSTEM GENERATED');canvas.drawRightString(553,29,str(doc.page));canvas.restoreState()
+    doc=SimpleDocTemplate(out,pagesize=A4,rightMargin=42,leftMargin=42,topMargin=52,bottomMargin=58,title='JWB Simulation '+kind,author='JWB Simulation Service')
+    doc.build(story,onFirstPage=page,onLaterPages=page);return out.getvalue()

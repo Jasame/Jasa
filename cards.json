@@ -1,0 +1,344 @@
+[
+  {
+    "id": "everyday",
+    "category": "lifestyle",
+    "name": "JWB Everyday Preferred",
+    "sub_zh": "日常优选卡 · 零年费信报基石",
+    "sub_en": "Zero-Fee Credit History Foundation",
+    "bin": "8888-0188",
+    "maxCap": 25000,
+    "annualFee": 0,
+    "feeText_zh": "$0 (终身免年费)",
+    "feeText_en": "$0 / yr",
+    "tierMultiplier": 1,
+    "welcomeJR": 35000,
+    "welcomeSpendReq": 1500,
+    "welcome_zh": "前 3 个月消费满 $1,500 获赠 35,000 JR（保底价值 $350）",
+    "welcome_en": "Earn 35,000 JR ($350 value) after $1,500 spend in first 3 months",
+    "badge_zh": "零年费基石 · 永久养信报",
+    "badge_en": "Zero Fee · Credit Builder",
+    "finishClass": "finish-everyday",
+    "accentHex": "#64748B",
+    "rates": {
+      "dining": 2,
+      "travel": 2,
+      "hotel": 2,
+      "everyday": 3
+    },
+    "autoCreditRule": {
+      "category": "everyday",
+      "maxAnnual": 60,
+      "singleCap": 15,
+      "label_zh": "流媒体账单自动抵扣",
+      "label_en": "Streaming Credit"
+    },
+    "fixedCredits": 60,
+    "tags_zh": [
+      "流媒体/通勤 3X",
+      "全品类无上限 2X",
+      "每年 $60 账单抵扣"
+    ],
+    "tags_en": [
+      "3X Streaming/Transit",
+      "2X Uncapped Everyday",
+      "$60 Annual Credit"
+    ],
+    "earn_zh": "全球流媒体/数字订阅 3X JR，日常通勤与充电/加油 3X JR，其余全部消费无上限 2X JR。",
+    "earn_en": "3X JR on global streaming & transit/EV charging, uncapped 2X JR on all other purchases.",
+    "perks_zh": [
+      "每年 $60 流媒体账单自动抵扣（每月 $5 自动入账）",
+      "手机碎屏与失窃保护险（最高赔付 $800）",
+      "全球购物延保与 0% 货币转换费，支持永久持有养信报"
+    ],
+    "perks_en": [
+      "$60 annual streaming statement credit ($5/month auto-applied)",
+      "Cell phone protection against damage & theft (up to $800 claim)",
+      "Extended warranty & 0% Foreign Transaction Fees globally"
+    ]
+  },
+  {
+    "id": "gold",
+    "category": "lifestyle",
+    "name": "JWB Gold",
+    "sub_zh": "甄选金卡 · 全球餐饮与品质生活旗舰",
+    "sub_en": "Global Dining & Everyday Luxury Flagship",
+    "bin": "8888-0288",
+    "maxCap": 50000,
+    "annualFee": 295,
+    "feeText_zh": "$295 / yr",
+    "feeText_en": "$295 / yr",
+    "tierMultiplier": 1.25,
+    "welcomeJR": 100000,
+    "welcomeSpendReq": 4000,
+    "welcome_zh": "前 6 个月消费满 $4,000 获赠 100,000 JR（保底价值 $1,000）",
+    "welcome_en": "Earn 100,000 JR ($1,000 value) after $4,000 spend in first 6 months",
+    "badge_zh": "等效负年费 (-$65) · 餐饮超市 5X",
+    "badge_en": "-$65 Net Effective Fee · 5X Dining",
+    "finishClass": "finish-gold",
+    "accentHex": "#D4AF37",
+    "rates": {
+      "dining": 5,
+      "travel": 3,
+      "hotel": 3,
+      "everyday": 1.5
+    },
+    "autoCreditRule": {
+      "category": "dining",
+      "maxAnnual": 360,
+      "singleCap": 30,
+      "label_zh": "全球餐饮与出行自动报销",
+      "label_en": "Dining & Ride Credit"
+    },
+    "fixedCredits": 360,
+    "tags_zh": [
+      "全球餐饮/超市 5X",
+      "全球机票 3X",
+      "每年 $360 自动报销"
+    ],
+    "tags_en": [
+      "5X Dining & Groceries",
+      "3X Global Flights",
+      "$360 Annual Credits"
+    ],
+    "earn_zh": "全球餐饮（含堂食与外卖）5X JR、全球超市与生鲜 5X JR、全球机票 3X JR，其余消费 1.5X JR。",
+    "earn_en": "5X JR on global dining & groceries, 3X JR on flights, 1.5X JR on all other spend.",
+    "perks_zh": [
+      "每年 $240 全球餐饮账单抵扣（每月 $20 自动入账）",
+      "每年 $120 全球打车出行抵扣（每月 $10 自动入账），合计报销 $360 倒赚 $65",
+      "全球精选酒店预订享 $100 餐饮额度及房型升等"
+    ],
+    "perks_en": [
+      "$240 annual dining credit ($20/month auto-applied)",
+      "$120 annual rideshare credit ($10/month), netting +$65 over annual fee",
+      "$100 property credit & room upgrade at JWB Hotel Collection"
+    ]
+  },
+  {
+    "id": "aero",
+    "category": "cobrand",
+    "name": "JWB Aero Reserve",
+    "sub_zh": "寰宇航司联名卡 · 头等舱与里程神卡",
+    "sub_en": "First Class Aviation & Global Companion Card",
+    "bin": "8888-0388",
+    "maxCap": 75000,
+    "annualFee": 450,
+    "feeText_zh": "$450 / yr",
+    "feeText_en": "$450 / yr",
+    "tierMultiplier": 1.45,
+    "welcomeJR": 130000,
+    "welcomeSpendReq": 5000,
+    "welcome_zh": "前 6 个月消费满 $5,000 获赠 130,000 JR（保底价值 $1,300）",
+    "welcome_en": "Earn 130,000 JR ($1,300 value) after $5,000 spend in first 6 months",
+    "badge_zh": "全球航司 8X · 头等舱伴侣免票券",
+    "badge_en": "8X Airlines · First Class Companion Pass",
+    "finishClass": "finish-aero",
+    "accentHex": "#38BDF8",
+    "rates": {
+      "dining": 4,
+      "travel": 8,
+      "hotel": 4,
+      "everyday": 1.5
+    },
+    "autoCreditRule": {
+      "category": "travel",
+      "maxAnnual": 300,
+      "singleCap": 150,
+      "label_zh": "全球航司自动报销",
+      "label_en": "Airline Statement Credit"
+    },
+    "fixedCredits": 300,
+    "tags_zh": [
+      "全球航司 8X",
+      "头等舱伴侣免票券",
+      "每年 $300 航司报销"
+    ],
+    "tags_en": [
+      "8X Global Airlines",
+      "First Class Companion Cert",
+      "$300 Airline Credit"
+    ],
+    "earn_zh": "全球所有航空公司机票及附加消费 8X JR、全球餐饮与租车 4X JR，其余消费 1.5X JR。",
+    "earn_en": "8X JR on all global airlines & ancillaries, 4X JR on dining & car rentals, 1.5X JR elsewhere.",
+    "perks_zh": [
+      "开卡及每年续卡赠送 1 张全球头等舱/商务舱同行伴侣免票券（仅需付税费）",
+      "每年 $300 航司消费/升舱/选座自动报销",
+      "无限次全球 JWB Aero 头等舱休息室通行、免费托运 3 件行李、延误满 2 小时立赔 $500"
+    ],
+    "perks_en": [
+      "Annual Global First/Business Class Companion Certificate upon opening & renewal",
+      "$300 annual automatic airline & seat upgrade statement credit",
+      "Unlimited JWB Aero First Lounge access, 3 free checked bags & $500 2-hr flight delay payout"
+    ]
+  },
+  {
+    "id": "aspire",
+    "category": "cobrand",
+    "name": "JWB Grand Horizon Aspire",
+    "sub_zh": "天际酒店联名卡 · 负年费奢华度假神卡",
+    "sub_en": "Luxury Resort & Diamond Elite Status Flagship",
+    "bin": "8888-0588",
+    "maxCap": 80000,
+    "annualFee": 550,
+    "feeText_zh": "$550 / yr",
+    "feeText_en": "$550 / yr",
+    "tierMultiplier": 1.55,
+    "welcomeJR": 160000,
+    "welcomeSpendReq": 5000,
+    "welcome_zh": "前 6 个月消费满 $5,000 获赠 160,000 JR（保底价值 $1,600）",
+    "welcome_en": "Earn 160,000 JR ($1,600 value) after $5,000 spend in first 6 months",
+    "badge_zh": "报销倒赚 $50 · 钻石会籍 + 免房券",
+    "badge_en": "Diamond Elite + Uncapped Free Night",
+    "finishClass": "finish-aspire",
+    "accentHex": "#C084FC",
+    "rates": {
+      "dining": 5,
+      "travel": 5,
+      "hotel": 14,
+      "everyday": 2
+    },
+    "autoCreditRule": {
+      "category": "hotel",
+      "maxAnnual": 600,
+      "singleCap": 200,
+      "label_zh": "奢华度假村与机票自动报销",
+      "label_en": "Resort & Flight Credit"
+    },
+    "fixedCredits": 600,
+    "tags_zh": [
+      "酒店直订 14X",
+      "直通最高钻石会籍",
+      "$600 报销 + 免房券"
+    ],
+    "tags_en": [
+      "14X Hotel Direct",
+      "Diamond Elite Status",
+      "$600 Credits + Free Night"
+    ],
+    "earn_zh": "全球合作酒店及度假村直订 14X JR、全球机票与餐饮 5X JR，其余消费 2X JR。",
+    "earn_en": "14X JR on global partner hotels & resorts, 5X JR on flights & dining, 2X JR on everything else.",
+    "perks_zh": [
+      "持卡直通全球合作奢华酒店最高级钻石会籍（保证行政酒廊、双人早餐、套房升等）",
+      "开卡首年即送 1 张全球不限等级通用免房券（Uncapped Free Night Award）",
+      "每年 $400 度假村自动抵扣 + $200 机票自动抵扣（仅固定报销即倒赚 $50）"
+    ],
+    "perks_en": [
+      "Complimentary top-tier Diamond Elite Status (executive lounge, daily breakfast & suite upgrades)",
+      "1 Uncapped Global Free Night Award every year upon card opening & renewal",
+      "$400 annual resort credit + $200 flight credit ($600 total credits exceed $550 annual fee)"
+    ]
+  },
+  {
+    "id": "platinum",
+    "category": "apex",
+    "name": "JWB Platinum",
+    "sub_zh": "寰宇白金卡 · 全球差旅与全能旗舰",
+    "sub_en": "Global Travel & Fine Hotels All-Rounder",
+    "bin": "8888-0688",
+    "maxCap": 150000,
+    "annualFee": 695,
+    "feeText_zh": "$695 / yr",
+    "feeText_en": "$695 / yr",
+    "tierMultiplier": 1.85,
+    "welcomeJR": 175000,
+    "welcomeSpendReq": 6000,
+    "welcome_zh": "前 6 个月消费满 $6,000 获赠 175,000 JR（保底价值 $1,750）",
+    "welcome_en": "Earn 175,000 JR ($1,750 value) after $6,000 spend in first 6 months",
+    "badge_zh": "$900 年度综合报销 · JWB FHR 礼遇",
+    "badge_en": "$900 Annual Credits · JWB FHR Perks",
+    "finishClass": "finish-platinum",
+    "accentHex": "#E2E8F0",
+    "rates": {
+      "dining": 3,
+      "travel": 10,
+      "hotel": 10,
+      "everyday": 1.5
+    },
+    "autoCreditRule": {
+      "category": "travel",
+      "maxAnnual": 900,
+      "singleCap": 250,
+      "label_zh": "全球差旅与数字生活自动报销",
+      "label_en": "Global Travel Auto-Credit"
+    },
+    "fixedCredits": 900,
+    "tags_zh": [
+      "JWB Travel 10X",
+      "$900 年度综合报销",
+      "FHR 保证 4PM 退房"
+    ],
+    "tags_en": [
+      "10X JWB Travel",
+      "$900 Annual Credits",
+      "FHR 4PM Late Checkout"
+    ],
+    "earn_zh": "JWB Travel 平台预订 10X JR、全球航司与酒店直订 6X JR，其余消费 1.5X JR。",
+    "earn_en": "10X JR via JWB Travel portal, 6X JR on direct flights & hotels, 1.5X JR on all other spend.",
+    "perks_zh": [
+      "每年 $400 差旅无门槛自动报销 + $300 数字生活与健康报销 + $200 全球专车报销（合计 $900）",
+      "无限次全球 JWB Reserve Lounge 及机场贵宾厅（每次可免费携伴 2 人）",
+      "JWB Fine Hotels & Resorts (FHR)：保证下午 4 点退房、客房升等、双早及 $150 住店消费额"
+    ],
+    "perks_en": [
+      "$400 travel credit + $300 digital/wellness credit + $200 global chauffeur credit ($900/yr total)",
+      "Unlimited JWB Reserve Lounge & global airport lounge access with 2 complimentary guests",
+      "JWB Fine Hotels & Resorts (FHR): guaranteed 4PM late checkout, upgrade, breakfast & $150 credit"
+    ]
+  },
+  {
+    "id": "centurion",
+    "category": "apex",
+    "name": "JWB Centurion Reserve",
+    "sub_zh": "黑金典藏卡 · 私人银行巅峰旗舰",
+    "sub_en": "Private Banking Apex Sovereign Card",
+    "bin": "8888-8888",
+    "maxCap": 500000,
+    "annualFee": 2500,
+    "feeText_zh": "$2,500 (免首年制卡费)",
+    "feeText_en": "$2,500 / yr",
+    "tierMultiplier": 3.2,
+    "welcomeJR": 300000,
+    "welcomeSpendReq": 0.01,
+    "welcome_zh": "首年激活并完成任意首刷即享 300,000 JR（保底价值 $3,000）",
+    "welcome_en": "Earn 300,000 JR ($3,000 value) upon activation and first purchase of any amount",
+    "badge_zh": "首刷立享 $3,000 · 顶奢卡段 8888-8888",
+    "badge_en": "$3,000 First-Swipe · BIN 8888-8888",
+    "finishClass": "finish-centurion",
+    "accentHex": "#F59E0B",
+    "rates": {
+      "dining": 6,
+      "travel": 6,
+      "hotel": 6,
+      "everyday": 3.5
+    },
+    "autoCreditRule": {
+      "category": "travel",
+      "maxAnnual": 2000,
+      "singleCap": 600,
+      "label_zh": "私人航空与顶奢百货抵扣",
+      "label_en": "Aviation & Luxury Credit"
+    },
+    "fixedCredits": 2000,
+    "tags_zh": [
+      "差旅/奢品 6X",
+      "大额 4X / 保底 2.5X",
+      "$2,000 航司与顶奢抵扣"
+    ],
+    "tags_en": [
+      "6X Travel & Luxury",
+      "4X High-Ticket / 2.5X Base",
+      "$2,000 Aviation & Luxury Credit"
+    ],
+    "earn_zh": "全球差旅与奢品消费 6X JR，单笔满 $5,000 消费享 4X JR，其余全品类无上限保底 2.5X JR。",
+    "earn_en": "6X JR on global travel & luxury goods, 4X JR on purchases ≥$5,000, uncapped 2.5X JR base.",
+    "perks_zh": [
+      "每年 $1,200 私人航空/头等舱账单直接抵扣 + $800 全球顶奢百货购物抵扣",
+      "24/7 专属私人银行客户经理（Dedicated Relationship Manager）及全球礼宾团队",
+      "四大奢华酒店最高会籍直通、机场 VIP 独立航站楼政要通道与停机坪专车接送"
+    ],
+    "perks_en": [
+      "$1,200 annual private aviation/first-class credit + $800 global luxury department store credit",
+      "24/7 Dedicated Private Bank Relationship Manager & global concierge team",
+      "Top-tier status across 4 hotel groups, private VIP terminal & tarmac limousine transfers"
+    ]
+  }
+]

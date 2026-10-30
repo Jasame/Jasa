@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <title>Jasa Worldwide Bank (JWB) — Full-Stack Private Banking & Clearing Core</title>
+  <!-- Self-hosted deferred utility runtime -->
+  <script defer src="assets/tailwind-runtime.js?v=6.0.1"></script>
+<style type="text/tailwindcss">@theme {--font-sans:Inter,system-ui,sans-serif;--font-mono:ui-monospace,monospace;}</style>
+  <!-- Google Fonts -->
+  <!-- PDF runtime loads on demand when exporting a certificate -->
+  
+
+  <script>
+    window.tailwind = window.tailwind || {};
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --ease-apple: cubic-bezier(0.22, 1, 0.36, 1);
+      --fan-step-x: 88px;
+      --fan-step-y: 8px;
+      --fan-rot-z: 5.2deg;
+      --fan-card-w: 276px;
+    }
+    @media (max-width: 1024px) {
+      :root {
+        --fan-step-x: 54px;
+        --fan-step-y: 6px;
+        --fan-rot-z: 4.2deg;
+        --fan-card-w: 226px;
+      }
+    }
+    @media (max-width: 640px) {
+      :root {
+        --fan-step-x: 28px;
+        --fan-step-y: 4px;
+        --fan-rot-z: 3.4deg;
+        --fan-card-w: 180px;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      background-color: #090A0F;
+      color: #F3F4F6;
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 12%, rgba(52, 211, 153, 0.06) 0%, transparent 40%),
+        linear-gradient(180deg, #090A0F 0%, #0D0F17 55%, #090A0F 100%);
+    }
+
+    /* Multi-Page View Transitions */
+    .spa-page {
+      display: none;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.35s var(--ease-apple), transform 0.35s var(--ease-apple);
+    }
+    .spa-page.is-active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Glass Panels & Navigation */
+    .glass-nav {
+      background: rgba(9, 10, 15, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-bottom-bar {
+      background: rgba(11, 13, 20, 0.94);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .glass-panel {
+      background: linear-gradient(165deg, rgba(23, 26, 38, 0.84) 0%, rgba(13, 15, 23, 0.95) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+      transition: border-color 0.35s var(--ease-apple);
+    }
+    .glass-panel:hover {
+      border-color: rgba(229, 207, 160, 0.24);
+    }
+
+    /* ISO/IEC 7810 Standard Credit Card Ratio (1.586 : 1) + 3D Glare */
+    .iso-card {
+      aspect-ratio: 1.586 / 1;
+      width: 100%;
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      user-select: none;
+      transform-style: preserve-3d;
+      transition: transform 0.35s var(--ease-apple), box-shadow 0.35s var(--ease-apple), filter 0.35s ease;
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.22);
+    }
+    .iso-card.is-frozen {
+      filter: grayscale(0.75) brightness(0.75);
+    }
+    .iso-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        115deg,
+        rgba(255, 255, 255, 0.016) 0px,
+        rgba(255, 255, 255, 0.016) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    .iso-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at var(--glare-x, 30%) var(--glare-y, 25%),
+        rgba(255, 255, 255, var(--glare-alpha, 0.12)) 0%,
+        rgba(229, 207, 160, 0.04) 35%,
+        transparent 68%
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* 6 Metallic Finishes */
+    .finish-everyday {
+      background: linear-gradient(135deg, #2D3240 0%, #1B1E27 52%, #11131A 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .finish-gold {
+      background: linear-gradient(135deg, #765B28 0%, #463514 52%, #241A09 100%);
+      border: 1px solid rgba(229, 207, 160, 0.42);
+    }
+    .finish-aero {
+      background: linear-gradient(135deg, #1E3550 0%, #101D2E 55%, #09101A 100%);
+      border: 1px solid rgba(125, 211, 252, 0.32);
+    }
+    .finish-aspire {
+      background: linear-gradient(135deg, #41294E 0%, #22152C 55%, #110A17 100%);
+      border: 1px solid rgba(216, 180, 254, 0.32);
+    }
+    .finish-platinum {
+      background: linear-gradient(135deg, #6E7482 0%, #3B404A 48%, #1C1F26 100%);
+      border: 1px solid rgba(255, 255, 255, 0.38);
+    }
+    .finish-centurion {
+      background: linear-gradient(135deg, #1C1C21 0%, #0B0B0E 55%, #030305 100%);
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      box-shadow: 0 22px 50px -10px rgba(0, 0, 0, 0.95), 0 0 25px rgba(212, 175, 55, 0.15), inset 0 1px 1px rgba(229, 207, 160, 0.38);
+    }
+
+    /* Realistic EMV Metallic Chip */
+    .emv-chip {
+      width: clamp(26px, 6.5vw, 36px);
+      height: clamp(19px, 4.8vw, 27px);
+      border-radius: 5px;
+      background: linear-gradient(135deg, #E8CA88 0%, #B89246 50%, #F2DCA4 100%);
+      position: relative;
+      border: 1px solid rgba(0, 0, 0, 0.38);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      flex-shrink: 0;
+    }
+    .emv-chip::before {
+      content: "";
+      position: absolute;
+      inset: 4px 6px;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      border-radius: 2px;
+    }
+    .emv-chip::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    /* Responsive 3D Hero Fan Stage */
+    .fan-stage {
+      perspective: 1400px;
+      height: 270px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+    }
+    @media (max-width: 640px) {
+      .fan-stage {
+        height: 185px;
+      }
+    }
+    .fan-card-wrapper {
+      width: var(--fan-card-w);
+      position: absolute;
+      transform-style: preserve-3d;
+      transition: transform 0.85s var(--ease-apple), opacity 0.65s var(--ease-apple);
+      cursor: pointer;
+      opacity: 0;
+      transform: translate3d(0, 100px, -300px) rotateX(28deg) scale(0.68);
+    }
+    .fan-stage.is-unfolded .fan-card-wrapper {
+      opacity: 1;
+      transform:
+        translate3d(
+          calc(var(--offset) * var(--fan-step-x)),
+          calc(var(--abs-offset) * var(--fan-step-y)),
+          calc(var(--abs-offset) * -18px)
+        )
+        rotateZ(calc(var(--offset) * var(--fan-rot-z)));
+    }
+    .fan-stage.is-unfolded .fan-card-wrapper:hover,
+    .fan-stage.is-unfolded .fan-card-wrapper.is-focused {
+      z-index: 60 !important;
+      transform:
+        translate3d(
+          calc(var(--offset) * var(--fan-step-x)),
+          -20px,
+          60px
+        )
+        rotateZ(0deg)
+        scale(1.07);
+    }
+
+    /* CSS Grid Collapsible Drawer */
+    .drawer-grid {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      transition: grid-template-rows 0.4s var(--ease-apple), opacity 0.35s var(--ease-apple);
+    }
+    .drawer-grid.is-open {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    .drawer-inner {
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* 3D Card Flip inside Studio */
+    .flip-perspective {
+      perspective: 1400px;
+    }
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1.586 / 1;
+      transform-style: preserve-3d;
+      transition: transform 0.75s var(--ease-apple);
+    }
+    .flip-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .flip-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Range Slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #E5CFA0;
+      border: 2px solid #090A0F;
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.55);
+      cursor: pointer;
+    }
+
+    /* Global Toast Notification */
+    #apiToast {
+      transition: all 0.35s var(--ease-apple);
+    }
+  
+@media(max-width:360px){:root{--fan-step-x:20px;--fan-card-w:152px;}}
+/* Responsive controls: native selects and numeric inputs must be allowed to shrink. */
+select,input {min-width:0;max-width:100%;} select {text-overflow:ellipsis;}
+.flex > select.flex-1,.flex > input.flex-1 {width:100%;min-width:0;}
+.grid > * {min-width:0;}
+button:focus-visible,[role=button]:focus-visible,input:focus-visible,select:focus-visible {outline:2px solid #e5cfa0;outline-offset:3px;}
+#apiToast{max-width:calc(100vw - 2rem)}
+#vaultActiveCardPreview .iso-card{max-width:520px;margin-inline:auto;}
+#vaultActiveCardPreview .iso-card>div{gap:8px;min-width:0;flex-wrap:wrap;}
+#vaultActiveCardPreview .iso-card .font-mono{overflow-wrap:anywhere;}
+.simulation-note{font:11px/1.6 system-ui;color:#a3a3a3;text-align:center;padding:9px 16px;border-bottom:1px solid #ffffff12;}
+@media(min-width:1024px) and (max-width:1240px){header nav button{padding-inline:7px!important;font-size:10px!important}header .font-semibold.truncate{max-width:125px}}
+@media(max-width:400px){header button[onclick="switchPage('home')"] .font-semibold{max-width:130px;font-size:12px}#soundToggleBtn{padding-inline:6px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+<style>@media(max-width:360px){header button[onclick="switchPage('home')"] .font-semibold{max-width:90px}}</style>
+
+
+
+<link rel="stylesheet" href="assets/fonts.css?v=6.0.1">
+<style id="jwb-modern-design">:root{--ui-font:'JWB Inter','JWB Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;--ink:#f3f4f5;--muted:#9da5b5;--accent:#e5c994;--surface:#141923;--edge:rgba(205,215,235,.105);color-scheme:dark;}
+html,body{font-family:var(--ui-font);font-size:15px;line-height:1.6;background:#0b1018;background-image:radial-gradient(ellipse at 50% -10%,#28374745,transparent 60%),radial-gradient(ellipse at 100% 45%,#13363218,transparent 50%);color:var(--ink);text-rendering:optimizeLegibility;}
+body{padding-bottom:0!important;}
+button,input,select,textarea{font:inherit;font-family:var(--ui-font);}
+.font-mono{font-family:var(--ui-font)!important;font-variant-numeric:tabular-nums lining-nums;letter-spacing:.015em;}
+#apiLogsContainer,#doubleEntryContainer{font-variant-numeric:tabular-nums;}
+h1,h2,h3{font-family:var(--ui-font);text-wrap:balance;letter-spacing:-.035em!important;}
+html[lang='zh-CN'] h1,html[lang='zh-CN'] h2{letter-spacing:-.015em!important;}
+h1{font-size:clamp(1.85rem,4.1vw,3.65rem)!important;font-weight:650!important;line-height:1.22!important;}
+h2{font-size:clamp(1.55rem,2.55vw,2.5rem)!important;line-height:1.3!important;font-weight:620!important;}
+h3{line-height:1.4!important;font-weight:600!important;}
+p{line-height:1.85!important;text-wrap:pretty;}
+main p.text-xs,main p.text-sm{font-size:14px!important;}
+main [class~='text-[10px]']{font-size:11px!important;line-height:1.55;}
+main [class~='text-[11px]']{font-size:12px!important;line-height:1.55;}
+main [class~='text-xs']{font-size:13px;line-height:1.6;}
+main .text-neutral-400{color:var(--muted);}
+main>section{padding-block:clamp(28px,4vw,56px)!important;}
+main>section>[class*='max-w-']{max-width:1440px!important;padding-inline:clamp(18px,3.5vw,56px)!important;}
+.glass-panel{background:linear-gradient(145deg,#19212eec,#111720f5);border:1px solid var(--edge);box-shadow:0 12px 40px #0000001c,inset 0 1px 0 #ffffff03;backdrop-filter:blur(16px);}
+.glass-panel:hover{border-color:#cbb38a38;}
+.glass-panel.rounded-3xl{border-radius:24px;padding:clamp(18px,2vw,30px);}
+.glass-panel.rounded-2xl{border-radius:20px;}
+[class*='bg-black/']{background-color:#080d154d;}
+.glass-nav{background:#0c121bee;backdrop-filter:blur(24px);border-bottom:1px solid var(--edge);}
+header>[class*='max-w-']{max-width:1560px;height:84px;padding-inline:clamp(16px,3vw,48px);gap:18px;}
+header nav{background:#ffffff04;border-color:var(--edge);padding:5px;}
+header nav button{font-family:var(--ui-font);font-size:12px!important;padding:9px 13px!important;line-height:1.3!important;}
+header button .font-semibold{font-weight:600;letter-spacing:-.03em;}
+#soundToggleBtn{font-size:11px!important;min-height:36px;}
+#langBtnZh,#langBtnEn{min-width:36px;min-height:30px;}
+button{transition:background .2s,border-color .2s,box-shadow .2s,transform .2s;cursor:pointer;}
+button:active{transform:translateY(1px);}
+main button{min-height:42px;}
+main button[class*='bg-amber-200'][class*='text-neutral-950']{background:linear-gradient(135deg,#eed8aa,#ddbd80);color:#18202c;box-shadow:inset 0 1px 0 #fff7,0 4px 12px #0002;}
+main button[class*='bg-amber-200'][class*='text-neutral-950']:hover{background:#f2dfba;box-shadow:0 4px 20px #e4c28a20;}
+input:not([type=range]):not([type=checkbox]),select{min-height:46px;border-radius:12px!important;background-color:#0d131e!important;border:1px solid #bdc9df24!important;padding:10px 12px!important;font-size:13px!important;line-height:1.4!important;color:#e9edf5;}
+input:not([type=range]):not([type=checkbox]):focus,select:focus{outline:none;box-shadow:0 0 0 3px #c9ac7222;border-color:#cfb07788!important;}
+input::placeholder{color:#748095;}
+input[type=range]{height:5px!important;}
+input[type=range]::-webkit-slider-thumb{width:18px;height:18px;border-color:#15202e;}
+label{font-size:12px!important;line-height:1.6!important;}
+.simulation-note{background:#c5ad7910;border-bottom:1px solid #c5ad7915;font:11px/1.65 var(--ui-font);color:#a8a49c;padding:9px 20px;}
+#page-home [data-i18n=heroDesc]{max-width:760px;font-size:15px!important;margin-top:20px;}
+#page-home [data-i18n=heroTitle]{max-width:900px;margin-inline:auto;}
+#bsTotalCashUsd,#bsTotalJrUsd,#bsTotalStatement,#bsNetWorth,#vaultTotalLimit,#vaultTotalJR,#vaultStatementBal{font-family:'JWB Inter',var(--ui-font)!important;font-size:clamp(22px,2.2vw,32px)!important;font-weight:550!important;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1.3;}
+#bsTotalJrPts,#bsTotalAvailCredit{overflow-wrap:anywhere;}
+#vaultActiveCardPreview .iso-card{max-width:490px;border-radius:18px;padding:clamp(16px,2vw,24px)!important;}
+.iso-card{border-radius:16px;box-shadow:0 15px 28px #0003,inset 0 1px 0 #fff2;}
+.iso-card .font-mono{font-family:'JWB Inter','JWB Sans SC',sans-serif!important;}
+#vaultActiveCardPreview .iso-card .text-xs,#vaultActiveCardPreview .iso-card .text-sm{font-size:clamp(11px,1vw,14px)!important;}
+#vaultCardsList>div{border-radius:14px;padding:14px;}
+#vaultCardsList>div:first-child{margin-top:6px;}
+#vaultCardsList>div .text-xs{font-size:12px;}
+#vaultCardsList>div>div:first-child{flex:1;min-width:0;}
+#vaultCardsList>div>div:last-child{max-width:44%;font-size:11px;}
+#sandboxLedger>div{padding:14px;border-radius:14px;}
+#sandboxLedger{max-height:420px;scrollbar-width:thin;scrollbar-color:#354256 transparent;}
+#apiLogsContainer,#doubleEntryContainer{scrollbar-width:thin;scrollbar-color:#354256 transparent;}
+#ledgerSearch{min-width:150px;}
+#calcNetValue{font-size:clamp(30px,3.5vw,48px)!important;letter-spacing:-.05em;}
+#certificateCanvas{display:block;max-width:680px;margin:0 auto;border:1px solid #e5c99444;box-shadow:0 16px 48px #0004;}
+#certPreviewBox{padding:clamp(12px,2vw,24px);background:#0d1420;}
+.cert-verification{max-width:680px;margin:16px auto 0;border-top:1px solid #ffffff16;padding-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+.cert-verification p{flex:1 1 240px;font-size:11px!important;color:#a6b1c2;margin:0;overflow-wrap:anywhere;}
+.cert-verification button{font-size:12px;min-height:40px;padding:8px 14px;border:1px solid #ddbd8050;border-radius:10px;color:#e5c994;}
+footer{background:#080e16!important;margin-top:20px;padding-block:28px!important;}
+footer>[class*='max-w-']{max-width:1440px;font-size:11px;line-height:1.7;gap:20px;}
+.wallet-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;}
+.wallet-layout{grid-template-columns:minmax(0,5fr) minmax(0,7fr)!important;gap:24px!important;}
+.studio-layout{grid-template-columns:minmax(0,5fr) minmax(0,7fr)!important;gap:32px!important;}
+.wallet-layout>*,.studio-layout>*{grid-column:auto!important;}
+#cardsGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px;}
+#treasuryWalletsGrid{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:14px;}
+@media(min-width:1600px){:root{--fan-step-x:102px;--fan-card-w:300px;}}
+@media(min-width:768px) and (max-width:1199px){.wallet-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.wallet-layout{grid-template-columns:1fr 1fr!important;gap:18px!important;}.studio-layout{grid-template-columns:1fr 1.1fr!important;gap:20px!important;}#cardsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}#treasuryWalletsGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}#productChangeSelect{width:100%!important;flex-basis:auto!important;}#productChangeSelect+button{width:100%;}#productChangeSelect.parent{flex-direction:column;}html[lang=en] header nav button{font-size:11px!important;padding-inline:9px!important;}}
+@media(max-width:1199px){header nav{display:none!important;}.glass-bottom-bar{display:block!important;}body{padding-bottom:calc(84px + env(safe-area-inset-bottom))!important;}header>[class*='max-w-']{height:72px;}header .font-semibold.truncate{max-width:none!important;}.glass-bottom-bar{background:#101823f5;border-top-color:#bdc9df22;backdrop-filter:blur(24px);}.glass-bottom-bar>div{height:72px;max-width:780px;margin:auto;gap:0;padding:8px 10px;}.glass-bottom-bar button{min-height:52px;font-family:var(--ui-font);font-size:11px;}.glass-bottom-bar button svg{width:20px;height:20px;}}
+@media(min-width:1200px){.glass-bottom-bar{display:none!important;}}
+@media(max-width:767px){header>[class*='max-w-']{height:66px;gap:8px;padding-inline:16px;}header button[onclick="switchPage('home')"]{gap:8px;}header button[onclick="switchPage('home')"] .font-semibold{font-size:13px!important;max-width:155px!important;}header button[onclick="switchPage('home')"]>div:first-child{width:34px;height:34px;}#soundToggleBtn{display:none;}.wallet-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;}.wallet-layout,.studio-layout{grid-template-columns:minmax(0,1fr)!important;gap:20px!important;}#cardsGrid{grid-template-columns:1fr!important;gap:20px;}#treasuryWalletsGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px;}.glass-panel.rounded-3xl{padding:18px;border-radius:20px;}.glass-panel.rounded-2xl{padding:16px;}main>section>[class*='max-w-']{padding-inline:16px!important;}main p.text-xs,main p.text-sm{font-size:13px!important;}#page-home [data-i18n=heroDesc]{font-size:13px!important;}#bsTotalCashUsd,#bsTotalJrUsd,#bsTotalStatement,#bsNetWorth,#vaultTotalLimit,#vaultTotalJR,#vaultStatementBal{font-size:clamp(17px,5vw,25px)!important;overflow-wrap:anywhere;}.wallet-stats>div{padding:14px!important;}.wallet-stats>div:last-child{grid-column:1/-1;}.wallet-stats>div:nth-child(3){grid-column:1/-1;}.wallet-stats>div:last-child .grid{gap:10px;}main button{min-height:44px;}#vaultActiveCardPreview .iso-card{max-width:490px;}#heroFanStage{margin-top:28px;}.simulation-note{font-size:10px;padding:8px 18px;}#sandboxWelcomeTitle{font-size:12px;}#sandboxLedger>div{align-items:flex-start;gap:12px;}#sandboxLedger>div>div:last-child{max-width:48%;}#ledgerSearch{min-width:100%;}#ledgerType{flex:1;}.cert-verification{gap:10px;}.cert-verification button{flex:1;}}
+@media(max-width:360px){header button[onclick="switchPage('home')"] .font-semibold{max-width:115px!important;}main>section>[class*='max-w-']{padding-inline:12px!important;}.glass-panel.rounded-3xl{padding:14px;}h1{font-size:1.7rem!important;}h2{font-size:1.4rem!important;}.wallet-stats{gap:10px!important;}.wallet-stats>div{padding:12px!important;}#vaultCardsList>div{padding:12px;gap:8px;}#vaultCardsList>div>div:last-child{max-width:42%;}}
+@media(pointer:coarse){button,a,input,select{touch-action:manipulation;}}
+@media(prefers-reduced-motion:reduce){.spa-page{transform:none!important;}button:active{transform:none!important;}}
+
+@media(min-width:768px) and (max-width:1199px){.product-change-controls{flex-direction:column!important;}}</style>
+<style>
+@media(max-width:1199px){.pos-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.pos-form-grid>div{grid-column:auto!important;}.pos-form-grid>div:first-child,.pos-form-grid>div:nth-child(2){grid-column:1/-1!important;}}
+@media(max-width:767px){.pos-form-grid>div:nth-child(2){grid-column:1/-1!important;}}
+</style><style>
+@media(max-width:767px){#soundToggleBtn{display:inline-flex;align-items:center;justify-content:center;position:relative;width:32px;min-height:32px;font-size:0!important;padding:0!important;}#soundToggleBtn::before{content:'';width:16px;height:16px;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23c6bdab' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H3v6h3l5 4zM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E");}#soundToggleBtn[data-muted=true]::after{content:'';position:absolute;width:21px;border-top:1.5px solid #c6bdab;transform:rotate(-45deg);}}
+@media(max-width:360px){header button[onclick="switchPage('home')"] .font-semibold{max-width:95px!important;}}
+</style><style id="jwb-release-motion">:root{--fan-card-w:300px;--fan-step-x:118px;--fan-step-y:13px;--fan-rot-z:5deg;}
+.release-hero{position:relative;text-align:center;isolation:isolate;padding-top:8px;}
+.release-hero::before{content:'';position:absolute;inset:-40px -5% 0;z-index:-1;background:radial-gradient(ellipse at 50% 54%,#c7a76c16,transparent 65%);pointer-events:none;}
+.release-hero .hero-copy{max-width:920px;margin:0 auto;}
+.release-hero h1{font-size:clamp(30px,4.8vw,66px)!important;max-width:1000px!important;margin:auto;}
+.release-hero [data-i18n=heroDesc]{max-width:700px!important;margin:15px auto 0!important;line-height:1.75!important;}
+.release-hero .hero-badge{font-size:10px!important;letter-spacing:.13em;border:none;background:transparent;margin-bottom:16px;padding:0;}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;margin:24px auto 40px;}
+.hero-actions button{min-width:150px;}
+.fan-stage{height:350px!important;margin:0 auto!important;perspective:1700px;max-width:1160px;}
+.fan-card-wrapper{width:var(--fan-card-w);transition:transform .62s cubic-bezier(.2,.8,.2,1),opacity .55s;outline:none;}
+.fan-stage.is-unfolded .fan-card-wrapper{transform:translate3d(calc(var(--offset)*var(--fan-step-x)),calc(var(--abs-offset)*var(--fan-step-y)),calc(var(--abs-offset)*-12px)) rotateZ(calc(var(--offset)*var(--fan-rot-z)));animation:fan-arrive .95s cubic-bezier(.16,1,.3,1) backwards;animation-delay:var(--intro-delay,0ms);}
+.fan-stage.is-unfolded .fan-card-wrapper:hover,.fan-stage.is-unfolded .fan-card-wrapper.is-focused,.fan-stage.is-unfolded .fan-card-wrapper:focus-visible{z-index:90!important;transform:translate3d(calc(var(--offset)*var(--fan-step-x)),-24px,45px) rotateZ(0) scale(1.07);}
+.fan-card-wrapper:focus-visible .iso-card{outline:2px solid #ead09e;outline-offset:6px;}
+@keyframes fan-arrive{from{opacity:0;transform:translate3d(0,100px,-240px) rotateX(25deg) rotateZ(0) scale(.72);}to{opacity:1;transform:translate3d(calc(var(--offset)*var(--fan-step-x)),calc(var(--abs-offset)*var(--fan-step-y)),calc(var(--abs-offset)*-12px)) rotateZ(calc(var(--offset)*var(--fan-rot-z)));}}
+.fan-card-wrapper .iso-card{padding:22px!important;border-radius:18px;box-shadow:0 24px 40px #0007,inset 0 1px 0 #fff5;border-width:1px;}
+.fan-card-wrapper .card-brand{font-size:24px;letter-spacing:-.07em;font-weight:700;color:#fff;}
+.fan-card-wrapper .card-tier{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#f3eee5d9;}
+.fan-card-wrapper .card-middle{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10;}
+.fan-card-wrapper .card-bottom{display:flex;align-items:flex-end;justify-content:space-between;position:relative;z-index:10;gap:8px;}
+.fan-card-wrapper .card-name{font-size:15px;font-weight:550;color:#fff;letter-spacing:-.02em;}
+.fan-card-wrapper .card-number{font-size:9px;letter-spacing:.15em;color:#fff9;}
+.fan-card-wrapper .card-network{font-size:8px;color:#ffefc7c9;letter-spacing:.12em;}
+.card-art{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit;z-index:0;}
+.card-art .card-monogram{font-family:'JWB Inter',sans-serif;position:absolute;right:-10px;bottom:-46px;font-size:118px;letter-spacing:-.11em;font-weight:650;line-height:1;color:#ffffff08;transform:rotate(-12deg);}
+.card-art .card-orbit{position:absolute;width:90%;aspect-ratio:1;border-radius:50%;border:1px solid #ffffff16;right:-35%;top:-36%;box-shadow:0 0 0 11px #fff02,0 0 0 22px #ffffff08,0 0 0 44px #ffffff04;transform:rotate(-30deg) scaleX(1.5);}
+.card-art::after{content:'';position:absolute;inset:0;background:linear-gradient(125deg,transparent 20%,#ffffff0e 42%,transparent 65%);}
+.finish-everyday{background:radial-gradient(ellipse at 80% 0,#94adbe22,transparent 65%),linear-gradient(125deg,#3d4b5c,#172230 70%)!important;}
+.finish-gold{background:radial-gradient(ellipse at 70% -10%,#ffdf9a45,transparent 60%),linear-gradient(130deg,#a28243,#71582e 35%,#362814 100%)!important;}
+.finish-aero{background:radial-gradient(ellipse at 95% 0,#60d9ed3d,transparent 65%),linear-gradient(130deg,#215477,#172e4d 60%,#0c172d)!important;}
+.finish-aspire{background:radial-gradient(ellipse at 80% 0,#d8a5f63d,transparent 60%),linear-gradient(135deg,#654677,#35203e 70%,#211329)!important;}
+.finish-platinum{background:radial-gradient(ellipse at 80% -10%,#fff8,transparent 70%),linear-gradient(130deg,#8996a5,#515d6d 60%,#27303e)!important;}
+.finish-centurion{background:radial-gradient(ellipse at 85% -10%,#d2ad6328,transparent 60%),linear-gradient(130deg,#242b34,#090d14 75%)!important;border-color:#d7b56b88!important;}
+.tiltable-card{transform:perspective(1200px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transition:transform .22s ease-out,box-shadow .3s;will-change:auto;}
+.hero-card-picker{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:900px;margin:4px auto 14px;}
+.hero-card-picker button{min-height:34px;padding:6px 13px;border-radius:99px;border:1px solid #a2b2ca24;background:#ffffff04;color:#9ba7b8;font-size:11px;transition:all .25s;min-width:0;}
+.hero-card-picker button.is-selected{background:#d3b57a1c;border-color:#d3b57a60;color:#efdbb5;}
+.hero-card-picker .picker-dot{width:5px;height:5px;display:inline-block;border-radius:50%;background:var(--dot);margin-right:6px;vertical-align:2px;}
+#fanHoverHint{max-width:950px;margin:0 auto;min-height:25px;color:#a8b2c1;font-size:12px!important;}
+.home-balance{margin-top:16px!important;margin-bottom:36px!important;}
+.release-section-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#b8a383;}
+#pageTransitionLine{position:fixed;top:0;left:0;right:0;height:2px;z-index:100;background:linear-gradient(90deg,#b69456,#f1dfaf,#8cd1c5);pointer-events:none;transform-origin:left;opacity:0;}
+.ui-ripple{position:absolute;border-radius:50%;background:#ffffff25;pointer-events:none;transform:scale(0);animation:ripple-spread .6s cubic-bezier(.2,.7,.2,1) forwards;z-index:0;}
+@keyframes ripple-spread{to{transform:scale(1);opacity:0;}}
+.fx-feed-panel{background:linear-gradient(135deg,#1a2634,#111b29);border:1px solid #d2b57f2e;border-radius:22px;padding:22px;margin-bottom:24px;}
+.fx-feed-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;}
+.fx-feed-head h3{font-size:17px;color:#ebedf2;margin:0;}
+.fx-status{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:#9eb6b1;line-height:1.6;}
+.fx-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#d4a76c;flex:none;}
+.fx-status[data-state=network]::before{background:#52caab;box-shadow:0 0 10px #52caab44;}
+.fx-status[data-state=loading]::before{animation:status-breathe 1s ease-in-out infinite;}
+@keyframes status-breathe{50%{opacity:.3;}}
+.fx-feed-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:16px;margin-top:18px;}
+.fx-feed-grid>div{padding:12px 14px;border-radius:12px;background:#080e173d;min-width:0;}
+.fx-feed-grid label{display:block;color:#77859a;font-size:10px!important;margin-bottom:5px;}
+.fx-feed-grid span{font-size:12px;color:#ccd5e0;overflow-wrap:anywhere;}
+.fx-feed-panel p{font-size:11px!important;color:#8c9bad;margin:14px 0 0;}
+.fx-settings{margin-top:16px;border-top:1px solid #ffffff0d;padding-top:12px;}
+.fx-settings summary{cursor:pointer;font-size:12px;color:#c9b58a;}
+.fx-settings-body{display:grid;grid-template-columns:1.2fr 1.2fr auto;align-items:end;gap:12px;margin-top:15px;}
+.fx-settings-body label{color:#8e9aac;display:block;font-size:11px;}
+.fx-settings-body input,.fx-settings-body select{display:block;width:100%;margin-top:6px;}
+.fx-settings-body button{border:1px solid #d3b57a55;border-radius:12px;color:#e5c994;padding:10px 15px;}
+.fx-settings-body [hidden]{display:none!important;}
+#fxRefreshBtn{font-size:12px;color:#e5d0a6;border:1px solid #ddc59144;border-radius:99px;padding:8px 16px;min-height:38px;}
+button:disabled{cursor:not-allowed;opacity:.5;transform:none!important;}
+#fxExecuteBtn{min-width:160px;}
+#fxQuoteMeta{font-size:11px;color:#8091a7;margin:10px 0 0;}
+.fx-fee-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.fx-fee-chips span{border:1px solid #52caab22;background:#52caab09;color:#83bcab;border-radius:8px;padding:4px 8px;font-size:11px;}
+#fxReverseBtn{border:1px solid #d4b57b44;border-radius:99px;min-height:32px;padding:5px 12px;font-size:12px;color:#d9c29a;margin-top:10px;}
+@media(min-width:1600px){:root{--fan-card-w:330px;--fan-step-x:132px;}.fan-stage{height:390px!important;}}
+@media(min-width:768px) and (max-width:1199px){:root{--fan-card-w:250px;--fan-step-x:90px;--fan-rot-z:4.5deg;}.fan-stage{height:310px!important;}}
+@media(max-width:767px){:root{--fan-card-w:174px;--fan-step-x:32px;--fan-step-y:9px;--fan-rot-z:5.5deg;}.release-hero h1{font-size:clamp(26px,7vw,38px)!important;}.release-hero .hero-badge{font-size:9px!important;letter-spacing:.06em;margin-bottom:12px;}.release-hero [data-i18n=heroDesc]{font-size:12px!important;max-width:360px!important;margin-top:12px!important;}.fan-stage{height:238px!important;}.fan-card-wrapper .iso-card{padding:12px!important;border-radius:12px;}.fan-card-wrapper .card-brand{font-size:16px;}.fan-card-wrapper .card-tier{font-size:7px;letter-spacing:.06em;}.fan-card-wrapper .card-name{font-size:10px;}.fan-card-wrapper .card-number{font-size:6px;}.fan-card-wrapper .card-network{font-size:6px;}.fan-card-wrapper .emv-chip{transform:scale(.8);transform-origin:left center;}.fan-card-wrapper .card-art .card-monogram{font-size:80px;bottom:-30px;}.hero-card-picker{gap:6px;max-width:350px;margin-top:0;}.hero-card-picker button{font-size:10px;min-height:30px;padding:5px 9px;}.hero-actions{margin:18px auto 28px;gap:8px;}.hero-actions button{font-size:12px;min-width:0;}.hero-actions button:last-child{min-height:36px;}.fx-feed-panel{padding:17px;border-radius:18px;}.fx-feed-grid{grid-template-columns:1fr;gap:8px;}.fx-feed-grid>div{padding:10px 12px;}.fx-settings-body{grid-template-columns:1fr;gap:14px;}#fanHoverHint{font-size:10px!important;line-height:1.65!important;min-height:34px;}.home-balance{margin-top:8px!important;}}
+@media(max-width:360px){:root{--fan-card-w:152px;--fan-step-x:26px;}.fan-stage{height:215px!important;}.hero-card-picker{max-width:290px;gap:5px;}.hero-card-picker button{font-size:9px;padding-inline:8px;}.release-hero [data-i18n=heroDesc]{font-size:11px!important;}.release-hero .hero-badge span:last-child{display:none;}}
+@media(prefers-reduced-motion:reduce){.fan-card-wrapper{animation:none!important;}.fan-stage.is-unfolded .fan-card-wrapper{animation:none!important;}.tiltable-card{transform:none!important;}.ui-ripple{display:none;}[data-fx-status]::before{animation:none!important;}}
+</style>
+<style>.fx-settings-body{grid-template-columns:repeat(2,minmax(0,1fr));}.fx-settings-body button{align-self:end;min-height:46px;}@media(max-width:767px){.fx-settings-body{grid-template-columns:1fr;}}</style>
+<link rel="stylesheet" href="assets/cloud.css?v=6.0.1">
+<link rel="stylesheet" href="assets/suite.css?v=6.0.1">
+<link rel="stylesheet" href="assets/ui.css?v=6.0.1">
+<link rel="stylesheet" href="assets/growth.css?v=6.0.1">
+</head>
+<body class="pb-24 lg:pb-12 selection:bg-amber-500/30 selection:text-amber-200">
+<div id="pageTransitionLine" aria-hidden="true"></div>
+
+  <!-- ===================================================================== -->
+  <!-- LIVE API GATEWAY TOAST NOTIFICATION                                   -->
+  <!-- ===================================================================== -->
+  <div role="status" aria-live="polite" aria-atomic="true" aria-hidden="true" id="apiToast" class="fixed top-20 right-4 z-50 pointer-events-none opacity-0 translate-y-[-12px] max-w-sm">
+    <div class="glass-panel rounded-2xl px-4 py-3 border border-emerald-400/40 shadow-2xl flex items-start gap-3">
+      <span id="apiToastDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 mt-1 shrink-0"></span>
+      <div class="min-w-0 font-mono text-xs">
+        <div id="apiToastRoute" class="text-amber-200 font-semibold truncate"></div>
+        <div id="apiToastMsg" class="text-neutral-200 text-[11px] mt-0.5 leading-snug break-words"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TOP NAVIGATION BAR (PC 6-Tab Capsule + Live Backend Status Pill)      -->
+  <!-- ===================================================================== -->
+  <header class="glass-nav sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+      <!-- Brand Identity -->
+      <button onclick="switchPage('home')" class="flex items-center gap-2.5 min-w-0 text-left group shrink-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-neutral-800 to-neutral-950 border border-amber-200/35 flex items-center justify-center shrink-0 group-hover:border-amber-200 transition">
+          <span class="font-mono font-bold text-xs sm:text-sm tracking-wider text-amber-200">JWB</span>
+        </div>
+        <div class="min-w-0">
+          <div class="font-semibold text-white text-sm sm:text-base tracking-tight truncate">Jasa Worldwide Bank</div>
+          <div class="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-emerald-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>SIMULATION · CLOUD 6.0.1</span>
+          </div>
+        </div>
+      </button>
+
+      <!-- Desktop 6-Page Capsule Navigation -->
+      <nav class="hidden lg:flex items-center p-1 rounded-full bg-white/[0.04] border border-white/10 shrink-0">
+        <button data-nav-desktop="home" onclick="switchPage('home')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold transition whitespace-nowrap bg-amber-200 text-neutral-950" data-i18n="tabHome">
+          总览与净值
+        </button>
+        <button data-nav-desktop="treasury" onclick="switchPage('treasury')" class="px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap text-neutral-300 hover:text-white" data-i18n="tabTreasury">
+          私行金库与闪兑
+        </button>
+        <button data-nav-desktop="cards" onclick="switchPage('cards')" class="px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap text-neutral-300 hover:text-white" data-i18n="tabCards">
+          旗舰卡矩阵 (6)
+        </button>
+        <button data-nav-desktop="vault" onclick="switchPage('vault')" class="px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap text-neutral-300 hover:text-white flex items-center gap-1.5">
+          <span data-i18n="tabVault">卡包与 POS 收银台</span>
+          <span id="desktopVaultBadge" class="px-1.5 py-0.2 rounded-full bg-amber-400/20 text-amber-200 font-mono text-[10px]">2</span>
+        </button>
+        <button data-nav-desktop="studio" onclick="switchPage('studio')" class="px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap text-neutral-300 hover:text-white" data-i18n="tabStudio">
+          风控秒批与制卡
+        </button>
+        <button data-nav-desktop="backend" onclick="switchPage('backend')" class="px-3.5 py-1.5 rounded-full text-xs font-medium transition whitespace-nowrap text-neutral-300 hover:text-white flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+          <span data-i18n="tabBackend">后端 API 与总账</span>
+        </button>
+      </nav>
+
+      <!-- Right Utility Controls -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0"><button id="cloudUserButton" class="cloud-btn cloud-user-btn" onclick="Cloud.user?openAccount():openAuth()">登录 / 注册</button>
+        <button id="soundToggleBtn" aria-pressed="true" onclick="toggleSound()" class="px-2.5 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 text-[11px] font-mono text-neutral-300 transition whitespace-nowrap">
+          🔊 音效
+        </button>
+
+        <div class="flex items-center p-0.5 rounded-full bg-white/[0.06] border border-white/10 shrink-0">
+          <button id="langBtnZh" onclick="setLanguage('zh')" class="px-2.5 py-1 rounded-full text-xs font-medium bg-white text-black transition whitespace-nowrap">中</button>
+          <button id="langBtnEn" onclick="setLanguage('en')" class="px-2.5 py-1 rounded-full text-xs font-medium text-neutral-400 hover:text-white transition whitespace-nowrap">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<main id="page-cloud" class="spa-page"><div id="cloudApp"></div></main>
+  <!-- ===================================================================== -->
+  <!-- PAGE 1: HOME OVERVIEW & PERSONAL BALANCE SHEET                        -->
+  <!-- ===================================================================== -->
+  <div class="simulation-note" data-demo-note>云端模拟体验 · 资金、卡片与审批均为模拟；汇率接入外部参考数据，不连接真实银行或支付网络。</div>
+  <main id="page-home" class="spa-page is-active">
+    <section class="pt-6 pb-10 sm:pt-10 sm:pb-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Hero Headline & 3D Fan Stage -->
+        <div class="release-hero"><div class="hero-copy text-center max-w-3xl mx-auto">
+          <div class="hero-badge inline-flex flex-wrap items-center justify-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] text-amber-200/90 font-mono mb-3">
+            <span>JASA NETWORK · BIN 8888</span>
+            <span class="text-neutral-600">•</span>
+            <span data-i18n="heroBadge">1 JR = $0.01 USD 恒定保底兑现</span>
+          </div>
+          <h1 class="text-2xl sm:text-5xl font-semibold tracking-tight text-white leading-tight" data-i18n="heroTitle">
+            六种风格，一种从容。
+          </h1>
+          <p class="mt-2.5 text-xs sm:text-base text-neutral-400 leading-relaxed max-w-2xl mx-auto" data-i18n="heroDesc">
+            从日常到远方，探索六款 JWB 卡片。多币种金库、透明换汇与卡片管理，尽在一处。
+          </p>
+
+        </div>
+
+        <!-- 3D Card Fly-In & Fan Stage -->
+        <div id="heroFanStage" class="fan-stage mt-5 sm:mt-8"><p role="status" style="position:absolute;inset:40% 0 auto;text-align:center;color:#c9b58a;font-size:14px">正在准备卡片 · Preparing your cards…</p></div>
+
+        <div id="heroCardPicker" class="hero-card-picker" aria-label="Explore six JWB cards"></div>
+        <div class="text-center mt-2 px-2">
+          <p class="text-xs text-neutral-400 font-mono leading-relaxed break-words" id="fanHoverHint" data-i18n="fanHint">
+            悬停聚焦卡片 · 点击探索详情 · 手机可左右滑动切换
+          </p>
+        </div>
+
+          <div class="hero-actions">
+            <button onclick="openFeaturedHeroCard()" class="px-5 py-2.5 rounded-full bg-amber-200 text-neutral-950 font-semibold text-xs sm:text-sm hover:bg-amber-100 transition shadow-lg shadow-amber-500/10">
+              探索所选卡片 ➔
+            </button>
+            <button onclick="switchPage('treasury')" class="px-4 py-2.5 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/30 text-xs sm:text-sm text-emerald-300 font-medium transition">
+              多币种金库与闪兑
+            </button>
+            <button onclick="replayFanAnimation()" class="px-3.5 py-2.5 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-xs text-neutral-300 transition">
+              ✦ 重播飞入动画
+            </button>
+          </div>
+
+</div>
+        <!-- Real-Time Personal Balance Sheet Bar -->
+        <div class="home-balance glass-panel rounded-3xl p-4 sm:p-6 mb-8 border border-amber-300/20">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span class="text-xs font-mono uppercase tracking-wider text-amber-200" data-i18n="bsHeader">JWB 实时个人资产负债总览 (LIVE BALANCE SHEET)</span>
+            </div>
+            <span id="bsLastSync" class="text-[11px] font-mono text-neutral-400">SYNCED VIA INDEXED-CORE</span>
+          </div>
+
+          <div id="cloudHomeBalances" hidden class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div onclick="switchPage('treasury')" class="p-3.5 rounded-2xl bg-black/40 border border-white/[0.06] cursor-pointer hover:border-amber-300/30 transition">
+              <div class="text-[10px] font-mono text-neutral-400 uppercase" data-i18n="bsCashLabel">多币种金库总折合 (USD)</div>
+              <div id="bsTotalCashUsd" class="text-lg sm:text-2xl font-mono font-bold text-white mt-1">$58,420.00</div>
+              <div class="text-[11px] text-emerald-400 font-mono mt-0.5">4.85% APY 计息中 ➔</div>
+            </div>
+
+            <div onclick="switchPage('vault')" class="p-3.5 rounded-2xl bg-black/40 border border-white/[0.06] cursor-pointer hover:border-amber-300/30 transition">
+              <div class="text-[10px] font-mono text-neutral-400 uppercase" data-i18n="bsJrLabel">JR 积分池现金价值 (1 JR=1¢)</div>
+              <div id="bsTotalJrUsd" class="text-lg sm:text-2xl font-mono font-bold text-amber-200 mt-1">$350.00</div>
+              <div id="bsTotalJrPts" class="text-[11px] text-neutral-400 font-mono mt-0.5">35,000 JR 可随时销账 ➔</div>
+            </div>
+
+            <div onclick="switchPage('vault')" class="p-3.5 rounded-2xl bg-black/40 border border-white/[0.06] cursor-pointer hover:border-amber-300/30 transition">
+              <div class="text-[10px] font-mono text-neutral-400 uppercase" data-i18n="bsDebtLabel">信用卡待还账单 / 可用授信</div>
+              <div id="bsTotalStatement" class="text-lg sm:text-2xl font-mono font-bold text-rose-300 mt-1">$0.00</div>
+              <div id="bsTotalAvailCredit" class="text-[11px] text-emerald-400 font-mono mt-0.5">总额度 $43,500 ➔</div>
+            </div>
+
+            <div onclick="switchPage('backend')" class="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/15 to-emerald-500/10 border border-amber-300/30 cursor-pointer">
+              <div class="text-[10px] font-mono text-amber-200 uppercase" data-i18n="bsNetWorthLabel">JWB 净流动资产 (NET WORTH)</div>
+              <div id="bsNetWorth" class="text-lg sm:text-2xl font-mono font-bold text-emerald-400 mt-1">$58,770.00</div>
+              <div class="text-[11px] text-neutral-300 font-mono mt-0.5">查看复式总账分录 ➔</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cardholder Charter Accordion -->
+        <div class="mt-10 max-w-4xl mx-auto">
+          <div class="text-center mb-5">
+            <div class="text-[11px] font-mono uppercase tracking-widest text-amber-200/80">CARDHOLDER CHARTER & TERMS</div>
+            <h2 class="text-lg sm:text-2xl font-semibold text-white mt-1" data-i18n="policyTitle">JWB 极度友好申卡与持卡准则</h2>
+          </div>
+
+          <div class="space-y-3">
+            <div class="glass-panel rounded-2xl p-4">
+              <button onclick="toggleElementDrawer('pol1', this)" class="w-full flex items-center justify-between gap-3 text-left">
+                <div>
+                  <div class="text-xs sm:text-sm font-semibold text-white" data-i18n="pol1Title">01 · 全系无损升降级（Lossless Product Change）</div>
+                  <div class="text-[11px] text-neutral-400 mt-0.5" data-i18n="pol1Brief">保留原 8888 卡号与完整信报历史，随时自由切换卡种</div>
+                </div>
+                <span class="drawer-arrow text-neutral-400 shrink-0">▾</span>
+              </button>
+              <div id="pol1" class="drawer-grid">
+                <div class="drawer-inner">
+                  <p class="pt-3 mt-3 border-t border-white/[0.06] text-xs text-neutral-300 leading-relaxed">
+                    JWB 全系 6 张信用卡共享统一底层授信账户架构。您可随时在「卡包与 POS」页面一键无损降级至 $0 年费的 Everyday Preferred 永久养信报，或无损升级至更高阶旗舰卡，原 16 位 8888 卡号、CVV 与信报账龄 100% 完整继承。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4">
+              <button onclick="toggleElementDrawer('pol2', this)" class="w-full flex items-center justify-between gap-3 text-left">
+                <div>
+                  <div class="text-xs sm:text-sm font-semibold text-white" data-i18n="pol2Title">02 · 无家族开卡礼限制（No Family Rule）</div>
+                  <div class="text-[11px] text-neutral-400 mt-0.5" data-i18n="pol2Brief">不论申卡先后顺序，每张卡片均可独立拿满限时史高开卡礼</div>
+                </div>
+                <span class="drawer-arrow text-neutral-400 shrink-0">▾</span>
+              </button>
+              <div id="pol2" class="drawer-grid">
+                <div class="drawer-inner">
+                  <p class="pt-3 mt-3 border-t border-white/[0.06] text-xs text-neutral-300 leading-relaxed">
+                    JWB 严禁任何因“曾持有高阶卡而取消低阶卡开卡奖励”的限制条款。即使您率先获批 JWB Centurion Reserve 或 JWB Platinum，后续申请 Gold、Aero、Aspire 或 Everyday Preferred 时，依然 100% 独立享有各卡全额限时史高 JR 开卡礼。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4">
+              <button onclick="toggleElementDrawer('pol3', this)" class="w-full flex items-center justify-between gap-3 text-left">
+                <div>
+                  <div class="text-xs sm:text-sm font-semibold text-white" data-i18n="pol3Title">03 · 全球 0% 货币转换费与 61 天 3 倍提额（0% FTF & 61-Day 3X CLI）</div>
+                  <div class="text-[11px] text-neutral-400 mt-0.5" data-i18n="pol3Brief">全系免除跨境手续费，良好用卡满 61 天支持最高 3 倍提额</div>
+                </div>
+                <span class="drawer-arrow text-neutral-400 shrink-0">▾</span>
+              </button>
+              <div id="pol3" class="drawer-grid">
+                <div class="drawer-inner">
+                  <p class="pt-3 mt-3 border-t border-white/[0.06] text-xs text-neutral-300 leading-relaxed">
+                    包含 $0 年费的 Everyday Preferred 在内，JWB 全系卡片通过 Jasa Network 进行全球零汇损本币直连清算，永久免除货币转换费（0% FTF）。同时，持卡满 61 天后即可申请最高 3 倍信用额度提升（Soft Pull），额度上限严格对应所选卡种的 Max Credit Limit Cap。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 2: PRIVATE TREASURY, MULTI-CURRENCY WALLETS & REAL FX SWAP       -->
+  <!-- ===================================================================== -->
+
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 3: FLAGSHIP CARDS MATRIX & 1 JR = 1¢ CALCULATOR                  -->
+  <!-- ===================================================================== -->
+  <main id="page-cards" class="spa-page">
+    <section class="py-8 sm:py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <div>
+          <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+            <div>
+              <div class="text-xs font-mono uppercase tracking-widest text-amber-200/80 mb-1">LIMITED-TIME ELEVATED WELCOME OFFERS</div>
+              <h2 class="text-xl sm:text-3xl font-semibold text-white" data-i18n="suiteTitle">探索 JWB 卡片</h2>
+              <p class="text-xs sm:text-sm text-neutral-400 mt-1" data-i18n="suiteSubtitle">
+                每张卡片均处于限时史高开卡礼阶段，配备专属 8888-0X88 卡段与明确的最高信用额度上限（Max Credit Limit Cap）。
+              </p>
+            </div>
+
+            <button id="toggleAllPerksBtn" onclick="toggleAllCardDrawers()" class="px-3.5 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-xs text-neutral-200 transition self-start md:self-auto whitespace-nowrap" data-i18n="expandAllPerks">
+              展开全部详细权益 ▾
+            </button>
+          </div>
+
+          <!-- Category Filter Bar -->
+          <div class="flex flex-wrap items-center gap-2 pb-2 mb-6">
+            <button onclick="filterCards('all')" data-cat-btn="all" class="px-4 py-1.5 rounded-full text-xs font-medium bg-amber-200 text-neutral-950 transition whitespace-nowrap">
+              全部旗舰卡 (6)
+            </button>
+            <button onclick="filterCards('lifestyle')" data-cat-btn="lifestyle" class="px-4 py-1.5 rounded-full text-xs font-medium bg-white/[0.05] text-neutral-300 hover:text-white border border-white/10 transition whitespace-nowrap">
+              零年费与餐饮生活 (Everyday / Gold)
+            </button>
+            <button onclick="filterCards('cobrand')" data-cat-btn="cobrand" class="px-4 py-1.5 rounded-full text-xs font-medium bg-white/[0.05] text-neutral-300 hover:text-white border border-white/10 transition whitespace-nowrap">
+              航司与奢华酒店联名 (Aero / Aspire)
+            </button>
+            <button onclick="filterCards('apex')" data-cat-btn="apex" class="px-4 py-1.5 rounded-full text-xs font-medium bg-white/[0.05] text-neutral-300 hover:text-white border border-white/10 transition whitespace-nowrap">
+              差旅与私行巅峰 (Platinum / Centurion)
+            </button>
+          </div>
+
+          <!-- 6 Flagship Cards Grid -->
+          <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <!-- Embedded 1 JR = 1 Cent Net Value Calculator -->
+        <div id="cloudCalculator" hidden class="pt-8 border-t border-white/[0.08]">
+          <div class="mb-6">
+            <div class="text-xs font-mono uppercase tracking-widest text-amber-200/80 mb-1">1 JR = $0.01 USD GUARANTEED FLOOR</div>
+            <h3 class="text-xl sm:text-2xl font-semibold text-white" data-i18n="calcTitle">「1 JR = 1 Cent」交互式净收益引擎</h3>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 glass-panel rounded-3xl p-5 sm:p-7 space-y-5">
+              <p class="text-xs text-neutral-400 my-3">估算假设：消费均匀分布，在该卡规定期限内达标才计入开卡奖励；按可用消费估算报销，不保证实际收益。</p>
+          <div id="calcCardTabs" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+              <div class="space-y-4 pt-1">
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm mb-1.5">
+                    <span class="text-neutral-300" data-i18n="sliderDining">全球餐饮、外卖与生鲜超市 (月均)</span>
+                    <span class="font-mono font-semibold text-amber-200" id="diningValDisplay">$800 / mo</span>
+                  </div>
+                  <input id="sliderDining" type="range" min="0" max="5000" step="100" value="800" oninput="updateCalculator()" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm mb-1.5">
+                    <span class="text-neutral-300" data-i18n="sliderTravel">全球机票、奢华酒店与度假村 (月均)</span>
+                    <span class="font-mono font-semibold text-amber-200" id="travelValDisplay">$1,000 / mo</span>
+                  </div>
+                  <input id="sliderTravel" type="range" min="0" max="8000" step="100" value="1000" oninput="updateCalculator()" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs sm:text-sm mb-1.5">
+                    <span class="text-neutral-300" data-i18n="sliderEveryday">日常综合、数字订阅与百货 (月均)</span>
+                    <span class="font-mono font-semibold text-amber-200" id="everydayValDisplay">$1,200 / mo</span>
+                  </div>
+                  <input id="sliderEveryday" type="range" min="0" max="10000" step="100" value="1200" oninput="updateCalculator()" />
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 glass-panel rounded-3xl p-5 sm:p-7 border border-amber-300/20">
+              <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                <div>
+                  <div class="text-[11px] font-mono text-neutral-400" id="calcActiveBin">8888-0288-XXXX-XXXX</div>
+                  <div class="text-lg font-semibold text-white" id="calcActiveName">JWB Gold</div>
+                </div>
+                <span class="px-2.5 py-1 rounded-full bg-amber-400/10 border border-amber-300/30 text-xs font-mono text-amber-200">1 JR = $0.01</span>
+              </div>
+              <div class="space-y-2.5 my-4 text-xs sm:text-sm">
+                <div class="flex justify-between"><span class="text-neutral-400">限时史高开卡礼</span><span class="font-mono text-white" id="calcWelcomeJR">100,000 JR ($1,000)</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">首年日常消费积分</span><span class="font-mono text-white" id="calcSpendJR">144,000 JR ($1,440)</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">首年总积分价值</span><span class="font-mono font-semibold text-amber-200" id="calcTotalJR">244,000 JR ($2,440)</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">年度固定报销总额</span><span class="font-mono text-emerald-400" id="calcFixedCredits">+$360</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">年费成本</span><span class="font-mono text-neutral-300" id="calcAnnualFee">-$295</span></div>
+              </div>
+              <div class="pt-3 border-t border-white/10 flex items-baseline justify-between">
+                <span class="text-xs font-mono text-neutral-400">首年净正收益 (NET VALUE)</span>
+                <span class="text-2xl font-mono font-bold text-emerald-400" id="calcNetValue">+$2,505</span>
+              </div>
+              <button onclick="openApprovalModal(currentCalcCardId)" class="mt-4 w-full py-3 rounded-2xl bg-amber-200 hover:bg-amber-100 text-neutral-950 font-semibold text-xs sm:text-sm transition">
+                立即申请此卡 ➔
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 4: MY CARD VAULT, CARD CONTROLS & CUSTOM POS TERMINAL            -->
+  <!-- ===================================================================== -->
+
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 5: INSTANT UNDERWRITING & 3D CARD STUDIO                         -->
+  <!-- ===================================================================== -->
+  <main id="page-studio" class="spa-page">
+    <section class="py-8 sm:py-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
+          <div>
+            <div class="text-xs font-mono uppercase tracking-widest text-amber-200 mb-1">CREDIT DECISIONS & CARD DESIGN</div>
+            <h2 class="text-xl sm:text-3xl font-semibold text-white" data-i18n="modalHeading">授信与卡片工作室</h2>
+            <p class="text-xs sm:text-sm text-neutral-400 mt-1">
+              实时结合您的年收入、信报账龄与私行金库 80% 质押加成计算授信额度，一键入库至您的数字卡包并导出 A4 官方证书。
+            </p>
+          </div>
+          <button onclick="switchPage('vault')" class="px-4 py-2 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 text-xs text-amber-200 font-mono transition self-start sm:self-auto">
+            前往我的卡包与 POS ➔
+          </button>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-4 sm:p-8 border border-white/15">
+          <div class="studio-layout grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+            <div class="lg:col-span-5 space-y-4 min-w-0">
+              <div>
+                <label class="block text-xs text-neutral-400 mb-1" data-i18n="formCardSelect">申请卡种 (Card Tier)</label>
+                <select id="modalCardSelect" onchange="runUnderwriting()" class="w-full px-3 py-2.5 rounded-xl bg-neutral-900 border border-white/15 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-300"></select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-neutral-400 mb-1" data-i18n="formHolderName">持卡人激光镌刻姓名 (Cardholder Name)</label>
+                <input id="inputName" type="text" value="JASA XU" maxlength="24" oninput="runUnderwriting()" class="w-full px-3 py-2 rounded-xl bg-white/[0.05] border border-white/15 text-xs sm:text-sm font-mono uppercase text-white" />
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[11px] text-neutral-400 mb-1 truncate" data-i18n="formIncome">年收入 ($)</label>
+                  <input id="inputIncome" type="number" value="85000" min="0" step="5000" oninput="runUnderwriting()" class="w-full px-2.5 py-2 rounded-xl bg-white/[0.05] border border-white/15 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-neutral-400 mb-1 truncate" data-i18n="formHistory">信报 (月)</label>
+                  <input id="inputMonths" type="number" value="7" min="1" max="360" oninput="runUnderwriting()" class="w-full px-2.5 py-2 rounded-xl bg-white/[0.05] border border-white/15 text-xs font-mono text-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-neutral-400 mb-1 truncate" data-i18n="formExisting">现有额度 ($)</label>
+                  <input id="inputExisting" type="number" value="6200" min="0" step="500" oninput="runUnderwriting()" class="w-full px-2.5 py-2 rounded-xl bg-white/[0.05] border border-white/15 text-xs font-mono text-white" />
+                </div>
+              </div>
+
+              <label class="flex items-center justify-between gap-2 p-3 rounded-xl bg-white/[0.03] border border-white/10 cursor-pointer">
+                <span class="text-xs text-neutral-300 font-mono" data-i18n="all8ToggleLabel">切换全8典藏靓号 (8888-8888-8888-8888)</span>
+                <input id="toggleAll8" type="checkbox" onchange="regenerateCardCredentials()" class="w-4 h-4 accent-amber-300 shrink-0" />
+              </label>
+
+              <div class="p-4 rounded-2xl bg-black/45 border border-white/10 space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-mono text-amber-200 truncate" data-i18n="riskReportHeader">《JWB 智能风控授信评估报告》</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-mono text-[10px] shrink-0">APPROVED</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="p-2.5 rounded-xl bg-white/[0.03]">
+                    <div class="text-neutral-400 text-[10px] truncate" data-i18n="riskScoreLabel">内部 JWB 信用评分</div>
+                    <div class="font-mono font-semibold text-white text-xs sm:text-sm mt-0.5" id="reportScore">785 / 850</div>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-white/[0.03]">
+                    <div class="text-neutral-400 text-[10px] truncate" data-i18n="riskCapLabel">最高额度上限 (Max Cap)</div>
+                    <div class="font-mono font-semibold text-amber-200 text-xs sm:text-sm mt-0.5" id="reportMaxCap">$50,000</div>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-white/[0.03]">
+                    <div class="text-neutral-400 text-[10px] truncate" data-i18n="riskInitLabel">当前获批额度 (含金库质押)</div>
+                    <div class="font-mono font-semibold text-emerald-400 text-xs sm:text-sm mt-0.5" id="reportInitialLimit">$28,500</div>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-white/[0.03]">
+                    <div class="text-neutral-400 text-[10px] truncate" data-i18n="riskHeadroomLabel">距离上限剩余空间</div>
+                    <div class="font-mono font-semibold text-neutral-200 text-xs sm:text-sm mt-0.5" id="reportHeadroom">$21,500</div>
+                  </div>
+                </div>
+                <div id="cliStatusBanner" class="hidden text-[11px] font-mono text-amber-200 bg-amber-400/10 border border-amber-300/20 rounded-lg px-3 py-1.5 leading-relaxed"></div>
+              </div>
+            </div>
+
+            <!-- Right Column: 3D Flip Card & Issuance Controls -->
+            <div class="lg:col-span-7 flex flex-col justify-between space-y-4 min-w-0">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2.5">
+                  <span class="text-[11px] text-neutral-400 font-mono truncate" data-i18n="flipInstruction">点击卡面 180° 翻转查看背面 8888 卡号与 5 位混合 CVV</span>
+                  <button onclick="flipStudioCard()" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs font-mono text-amber-200 transition shrink-0" data-i18n="flipBtn">
+                    ↻ 翻转卡面
+                  </button>
+                </div>
+
+                <div class="flip-perspective w-full max-w-md mx-auto cursor-pointer" onclick="flipStudioCard()">
+                  <div id="studioCardFlipInner" class="flip-inner">
+                    <div id="studioCardFront" class="flip-face iso-card finish-gold p-4 sm:p-6 flex flex-col justify-between">
+                      <div class="relative z-10 flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-base sm:text-lg tracking-wider text-white">JWB</span>
+                            <span id="studioFrontTitle" class="text-[11px] sm:text-xs font-mono tracking-widest uppercase text-neutral-200 truncate">JWB GOLD</span>
+                          </div>
+                          <div class="text-[9px] sm:text-[10px] font-mono text-neutral-300/80">JASA WORLDWIDE BANK</div>
+                        </div>
+                        <span id="studioFrontBadge" class="px-2 py-0.5 rounded-full bg-black/40 border border-white/15 text-[9px] sm:text-[10px] font-mono text-amber-200 shrink-0">
+                          MAX CAP $50,000
+                        </span>
+                      </div>
+
+                      <div class="relative z-10 flex items-center justify-between my-auto">
+                        <div class="flex items-center gap-2.5">
+                          <div class="emv-chip"></div>
+                          <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white/70" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" d="M8.5 14.5a4 4 0 010-5M11.5 16.5a7 7 0 010-9M14.5 18.5a10 10 0 010-13"/>
+                          </svg>
+                        </div>
+                        <div class="text-right font-mono">
+                          <div class="text-[9px] sm:text-[10px] text-neutral-300 uppercase">Approved Credit Line</div>
+                          <div id="studioFrontLimit" class="text-sm sm:text-lg font-bold text-emerald-300">$28,500</div>
+                        </div>
+                      </div>
+
+                      <div class="relative z-10 flex items-end justify-between gap-2">
+                        <div class="min-w-0">
+                          <div class="text-[8px] sm:text-[9px] font-mono uppercase tracking-widest text-neutral-400">CARDHOLDER</div>
+                          <div id="studioFrontHolder" class="font-mono text-xs sm:text-sm tracking-widest text-white font-medium truncate">JASA XU</div>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <div class="text-[9px] sm:text-[10px] font-mono tracking-widest text-amber-200">JASA NETWORK</div>
+                          <div id="studioFrontBin" class="text-[10px] sm:text-[11px] font-mono text-neutral-300">BIN 8888-0288</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="studioCardBack" class="flip-face flip-back iso-card finish-gold flex flex-col justify-between">
+                      <div class="w-full h-8 sm:h-10 bg-neutral-950/90 mt-3 sm:mt-4 border-y border-white/10 flex items-center justify-between px-4 sm:px-5">
+                        <span class="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 truncate">JASA ZERO-FX HOLOGRAM</span>
+                        <span class="text-[9px] sm:text-[10px] font-mono text-amber-200 shrink-0">LUHN VERIFIED</span>
+                      </div>
+
+                      <div class="px-4 sm:px-6 py-1 sm:py-2 space-y-1.5 relative z-10">
+                        <div class="text-[9px] sm:text-[10px] font-mono uppercase text-neutral-300">16-Digit Card Number (BIN 8888)</div>
+                        <div id="studioBackNumber" class="font-mono text-sm sm:text-lg tracking-wider font-semibold text-white">
+                          8888-0288-4921-8834
+                        </div>
+                        <div class="flex items-center gap-5 pt-0.5">
+                          <div>
+                            <span class="text-[9px] font-mono text-neutral-400 block">VALID THRU</span>
+                            <span id="studioBackExp" class="font-mono text-xs sm:text-sm text-white">10/31</span>
+                          </div>
+                          <div>
+                            <span class="text-[9px] font-mono text-neutral-400 block">5-CHAR HYBRID CVV</span>
+                            <span id="studioBackCvv" class="font-mono text-xs sm:text-sm px-2 py-0.5 rounded bg-amber-300/20 text-amber-200 font-bold">AK8B0</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="px-4 sm:px-6 pb-3 sm:pb-4 flex items-center justify-between text-[9px] sm:text-[10px] font-mono text-neutral-300 relative z-10">
+                        <span>JASA WORLDWIDE BANK N.A.</span>
+                        <span>1 JR = $0.01 USD</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span class="text-neutral-400">PAN: <strong id="plainCardNum" class="text-white">8888-0288-XXXX-XXXX</strong></span>
+                  <span class="text-neutral-400">EXP: <strong id="plainExp" class="text-white">10/31</strong></span>
+                  <span class="text-neutral-400">CVV: <strong id="plainCvv" class="text-amber-200">AK8B0</strong></span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button onclick="regenerateCardCredentials()" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-neutral-200 transition" data-i18n="regenBtn">换号</button>
+                  <button id="copyCredsBtn" onclick="copyCredentials()" class="px-3 py-1 rounded-lg bg-amber-200/20 hover:bg-amber-200/30 text-amber-200 transition" data-i18n="copyBtn">复制卡号与 CVV</button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <button id="saveVaultBtn" onclick="saveApprovedCardToVault()" class="py-3 px-3 rounded-xl bg-amber-400/20 hover:bg-amber-400/30 border border-amber-300/40 text-xs font-semibold text-amber-200 transition">
+                  ✦ 签发并存入卡包
+                </button>
+                <button id="walletBindBtn" onclick="bindAppleWallet()" class="py-3 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-xs font-medium text-white transition" data-i18n="walletBtn">
+                   Apple Wallet
+                </button>
+                <button onclick="simulate61DayCLI()" class="py-3 px-3 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/30 text-xs font-medium text-emerald-300 transition" data-i18n="cliBtn">
+                  ⚡ 61天 3倍提额
+                </button>
+                <button id="pdfDownloadBtn" onclick="generateAndDownloadOfficialPDF()" class="py-3 px-3 rounded-xl bg-amber-200 hover:bg-amber-100 text-neutral-950 font-semibold text-xs transition" data-i18n="pdfBtn">
+                  ⬇ 下载 PDF 证书
+                </button>
+              </div>
+
+              <div id="certPreviewBox" class="hidden pt-2">
+                <div class="flex items-center justify-between text-xs text-neutral-400 mb-2 font-mono">
+                  <span>OFFICIAL CERTIFICATE PREVIEW (HIGH-DPI RENDER)</span>
+                  <button onclick="document.getElementById('certPreviewBox').classList.add('hidden')" class="text-amber-200 hover:underline">收起预览 ✕</button>
+                </div>
+                <canvas aria-label="JWB certificate preview" id="certificateCanvas" width="1240" height="1754" class="w-full rounded-xl border border-amber-300/30 shadow-2xl"></canvas>
+<div class="cert-verification"><p id="certificateSignatureStatus"></p><button onclick="verifyCertificateRecord()">验证签发记录</button><button onclick="downloadCertificateRecord()">下载验证记录</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 6: CORE BANKING BACKEND, REST API LOGS & DOUBLE-ENTRY LEDGER     -->
+  <!-- ===================================================================== -->
+
+
+  <!-- ===================================================================== -->
+  <!-- MOBILE NATIVE BOTTOM TAB BAR (6 Tabs for Complete System Access)      -->
+  <!-- ===================================================================== -->
+  <nav class="glass-bottom-bar fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+    <div class="grid grid-cols-6 h-16 max-w-lg mx-auto px-1">
+      <button data-nav-mobile="home" onclick="switchPage('home')" class="flex flex-col items-center justify-center gap-1 text-amber-200 font-semibold transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9.5z"/></svg>
+        <span class="text-[10px]">总览</span>
+      </button>
+
+      <button data-nav-mobile="treasury" onclick="switchPage('treasury')" class="flex flex-col items-center justify-center gap-1 text-neutral-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px]">金库</span>
+      </button>
+
+      <button data-nav-mobile="cards" onclick="switchPage('cards')" class="flex flex-col items-center justify-center gap-1 text-neutral-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path stroke-linecap="round" d="M2 10h20"/></svg>
+        <span class="text-[10px]">旗舰卡</span>
+      </button>
+
+      <button data-nav-mobile="vault" onclick="switchPage('vault')" class="relative flex flex-col items-center justify-center gap-1 text-neutral-400 transition">
+        <span id="mobileVaultBadge" class="absolute top-1 right-2.5 px-1 rounded-full bg-amber-300 text-neutral-950 font-mono font-bold text-[9px]">2</span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7H4a2 2 0 00-2 2v9a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+        <span class="text-[10px]">卡包POS</span>
+      </button>
+
+      <button data-nav-mobile="studio" onclick="switchPage('studio')" class="flex flex-col items-center justify-center gap-1 text-neutral-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        <span class="text-[10px]">秒批</span>
+      </button>
+
+      <button data-nav-mobile="backend" onclick="switchPage('backend')" class="flex flex-col items-center justify-center gap-1 text-neutral-400 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+        <span class="text-[10px]">后端</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Desktop Footer -->
+  <footer class="border-t border-white/[0.08] py-8 bg-black/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500 text-center sm:text-left">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono font-bold text-amber-200">JWB</span>
+        <span>© 2026 Jasa Worldwide Bank N.A. · Interactive Banking Simulation Cloud 6.0.1 · No live banking connection.</span>
+      </div>
+      <div class="font-mono text-neutral-400">1 JR = $0.01 USD · Double-Entry Bookkeeping · Reference FX · Zero Simulated Markup</div>
+    </div>
+  <div class="rate-attribution" style="text-align:center;font-size:10px;color:#77859a;padding:6px 18px"><a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By Exchange Rate API</a> · <a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter</a> · <span data-fx-status class="fx-status"></span></div>
+</footer>
+
+  <script defer src="assets/core.js?v=6.0.1"></script>
+<template id="jwb-font-licenses"><pre>inter
+Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+&quot;Font Software&quot; refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+&quot;Reserved Font Name&quot; refers to any names specified as such after the
+copyright statement(s).
+
+&quot;Original Version&quot; refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+&quot;Author&quot; refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION &amp; CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+
+
+notosanssc
+Copyright 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name &#x27;Source&#x27;
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://scripts.sil.org/OFL
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+&quot;Font Software&quot; refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+&quot;Reserved Font Name&quot; refers to any names specified as such after the
+copyright statement(s).
+
+&quot;Original Version&quot; refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+&quot;Modified Version&quot; refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+&quot;Author&quot; refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION &amp; CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+</pre></template>
+<script defer src="assets/cloud.js?v=6.0.1"></script>
+<script defer src="assets/suite.js?v=6.0.1"></script>
+<script defer src="assets/ui.js?v=6.0.1"></script>
+<script defer src="assets/growth.js?v=6.0.1"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"name":"jwb-browser-regression","private":true,"scripts":{"test":"playwright test","snapshots":"playwright test --update-snapshots"},"devDependencies":{"@playwright/test":"1.58.2"}}
